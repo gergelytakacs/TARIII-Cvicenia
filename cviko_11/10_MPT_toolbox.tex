@@ -1,0 +1,202 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mcode}
+
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie X, Parametrické programovanie, Explicitné MPC}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[7.12.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Na dnešnom cvièení}
+\vspace{5mm}
+\begin{itemize}
+\item Zostavenie MPC regulátora pomocou rozhrania LTI system
+\item Transformácia implicitného MPC problému do explicitného
+\item Porovnanie vıkonu
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Z prednášky}
+Riadiaci zákon MPC sa dá rieši explicitne ako súbor po èastiach afinnıch (lineárnych) riadiacich zákonov. Dá sa teda poveda e optimálny vstup systému je funkcia stavu systému $\vec{u}=\vec{u}(x)$ v príslušnom regióne $\mathcal{R}_{n}$\\
+
+\begin{equation*}
+u^{\ast}=\text{\textbf{f}}(x)=
+\begin{cases}
+\mathbf{f}_{1}x+g_{1}&\text{ak}\;x\in\mathcal{R}_{1}\\
+\mathbf{f}_{2}x+g_{2}&\text{ak}\;x\in\mathcal{R}_{2}\\
+&\vdots\\
+\mathbf{f}_{n_r}x+g_{n_r}\enspace&\text{ak}\;x\in\mathcal{R}_{n_r}
+\end{cases}
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Ako nato}
+Pre MATLAB sa dá poui MPT toolbox (MPT3). Je dostupnı na \url{http://people.ee.ethz.ch/~mpt/3/}\\[2ex]
+Inštalácia:
+\begin{itemize}
+\item skopírova súbor "install\_MPT3.m" zloky \url{C:\\MATLAB}
+\item spusti ho v MATLABe
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ako nato}
+Vytvoríte model lineárneho dynamického systému pomocou príkazu "\textbf{LTISystem}"
+\begin{lstlisting}
+model = LTISystem('A', A, 'B', B, 'C', C, 'D', D);
+\end{lstlisting}
+Potom sa vytvorí MPC regulátor
+\begin{lstlisting}
+ctrl = MPCController(model, np);
+\end{lstlisting}
+Zadajú sa váhovacie matice systému
+\begin{lstlisting}
+ctrl.model.x.penalty = QuadFunction(Q);
+ctrl.model.u.penalty = QuadFunction(R);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Ako nato}
+Ohranièenia kvadratického problému sa zadajú príkazmi:
+\begin{lstlisting}
+ctrl.model.u.min = Umix;
+ctrl.model.u.max = Umax;
+ctrl.model.x.min = Xmix;
+ctrl.model.x.max = Xmax;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Ako nato}
+Takto vytvorenı MPC regulátor sa premení do explicitnej formy pomocou
+\begin{lstlisting}
+expctrl = ctrl.toExplicit();
+\end{lstlisting}
+Keï máme vytvorenı model, vypoèítame akènı zásah na základe stavu systému:
+\begin{lstlisting}
+U(i) = ctrl.evaluate(X(:,i));
+\end{lstlisting}
+a pre explicitné riešenie:
+\begin{lstlisting}
+U(i) = expctrl.evaluate(X(:,i));
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Ako nato}
+Ïalej je moné graficky znázorni
+\begin{itemize}
+\item stavové partície: \begin{lstlisting}
+expctrl.partition.plot();
+\end{lstlisting}
+\item PWA riadiaci zákon \begin{lstlisting}
+expctrl.feedback.fplot();
+\end{lstlisting}
+\item PWQ úèelvú funkciu \begin{lstlisting}
+expctrl.cost.fplot();
+\end{lstlisting}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{itemize}
+\item naèítajte váš identifikovanı systém, a vytvorte MPC regulátor pod¾a doterajšieho postupu
+\item vytvorte implicitnı a explicitnı regulátor pomocou "\textbf{LTISystem}" a nalaïte ich tak aby podávali podobnı vıkon ako váš MPC regulátor
+\item urobte simuláciu regulaèného pochodu pre všetky tri prípady, zmerajte èas vıpoètu celého cyklu pomocou príkazu "\textbf{tic - toc}"
+\item graficky porovnajte priebehy všetkıch troch simulácií
+\item graficky znázornite stavové partície, PWA riadiaci zákon a PWQ úèelovú funkciu explicitného regulátora
+\item otvorte šampanské a oslávte dokonèenie posledného zadania TARIII
+\end{itemize}
+\end{frame}
+
+\end{document}

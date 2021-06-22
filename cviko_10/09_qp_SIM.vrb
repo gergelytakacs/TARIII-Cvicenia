@@ -1,0 +1,16 @@
+\frametitle{Pomôcka}
+Zabezpeèíme aby Simulink nekompiloval funkciu quadprog, napíšeme funkciu nasledovným spôsobom:
+\begin{lstlisting}
+function u = fcn(H,G,x,Ac,b0)
+%#codegen
+
+u=double(ones(30,1));
+
+% MPC with constrains
+coder.extrinsic('optimset','quadprog');
+options = optimset('Display','off','Algorithm','active-set');
+[u_ast,f]=quadprog(H,G*x,Ac,b0,[],[],[],[],[],options);
+
+u=u_ast;
+
+\end{lstlisting}

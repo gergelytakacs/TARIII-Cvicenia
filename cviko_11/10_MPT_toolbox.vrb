@@ -1,0 +1,13 @@
+\frametitle{Ako nato}
+Ïalej je moné graficky znázorni
+\begin{itemize}
+\item stavové partície: \begin{lstlisting}
+expctrl.partition.plot();
+\end{lstlisting}
+\item PWA riadiaci zákon \begin{lstlisting}
+expctrl.feedback.fplot();
+\end{lstlisting}
+\item PWQ úèelvú funkciu \begin{lstlisting}
+expctrl.cost.fplot();
+\end{lstlisting}
+\end{itemize}

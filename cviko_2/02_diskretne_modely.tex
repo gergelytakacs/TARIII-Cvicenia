@@ -1,0 +1,253 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Te�ria automatick�ho riadenia III.}
+\subtitle{Cvi�enie II, Diskr�tne stavov� modely}
+
+\author[] % (optional, use only with lots of authors)
+{G. Tak�cs, G. Batista}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  �stav automatiz�cie, merania a aplikovanej informatiky\\
+  Strojn�cka fakulta, Slovensk� technick� univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[28.09.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatiz�cia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Odvodenie spojit�ho stavov�ho modelu}
+Dynamick� syst�m $n$-t�ho r�du v tvare:
+\begin{equation*}
+\frac{d^{n}y(t)}{dt^{n}} + a_{n-1}\frac{d^{n-1}y(t)}{dt^{n-1}} +...+a_{0}y(t)=u(t)
+%b_{n}\frac{d^{n}u(t)}{dt^{n}}+b_{n-1}\frac{d^{n-1}u(t)}{dt^{n-1}}+...+b_{0}u(t)
+\end{equation*}
+M��eme rozbi� na $n$ diferenci�lnych rovn�c prv�ho r�du, kde:
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+x_{1}(t)&=&y(t)\\
+x_{2}(t)&=&\frac{dy(t)}{dt^{n-1}}\\
+...\\
+x_{n}(t)&=&\frac{d^{n-1}y(t)}{dt}
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+\frac{dx_{1}(t)}{dt}&=&\dot{x_{1}}=\frac{dy(t)}{dt}=x_{2}(t)\\
+\frac{dx_{2}(t)}{dt}&=&\dot{x_{2}}=\frac{d^{2}y(t)}{dt^{2}}=x_{3}(t)\\
+...&\\
+\frac{dx_{n}(t)}{dt}&=&\dot{x_{n}}=\frac{d^{n}y(t)}{dt^{n}}\\
+\end{eqnarray*}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Odvodenie spojit�ho stavov�ho modelu}
+Z toho sa d� posklada� stavov� model v maticovom tvare:
+\begin{eqnarray*}
+\begin{bmatrix}
+\dot{x}_{1}\\\dot{x}_{2}\\\colon \\ \dot{x}_{n-1}\\ \dot{x}_{n}
+\end{bmatrix}
+&=&
+\begin{bmatrix}
+0 & 1 & 0 & ... &  0 \\
+0 & 0 & 1 & ... &  0 \\
+\colon & \colon & \colon & \ddots & \colon\\
+0 & 0 & 0 & ... & 1 \\
+-a_{0} & -a_{1} & -a_{2} & ... & -a_{n-1}
+\end{bmatrix}
+\begin{bmatrix}
+x_{1}\\x_{2}\\\colon\\x_{n-1}\\x_{n}
+\end{bmatrix}
++
+\begin{bmatrix}
+0\\ 0\\ \colon \\ 0\\ 1
+\end{bmatrix}
+u(t)
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Diskretiz�cia stavov�ho modelu}
+Spojit� stavov� model v tvare:
+\begin{eqnarray*}
+\vec{\dot{x}}(t)&=& \vec{A}\vec{x}(t)+\vec{B} \vec{u}(t)\\
+\vec{y}(t) &=& \vec{C}\vec{x}(t)
+\end{eqnarray*}
+Transformujeme do diskr�tneho tvaru:
+\begin{eqnarray*}
+\vec{x}(k+1)&=& \vec{A_{d}}\vec{x}(k)+\vec{B_{d}} \vec{u}(k)\\
+\vec{y}(k) &=& \vec{C}\vec{x}(k)
+\end{eqnarray*}
+kde,
+\begin{eqnarray*}
+\vec{A_{d}}&=&e^{\vec{A}T}\\
+\vec{B_{d}}&=&\int^{T}_{0}e^{\vec{A}\lambda}d\lambda\vec{B}\\
+\lambda&\in&[0,kT]
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Simul�cia diskr�tneho modelu v Matlabe}
+\begin{itemize}
+\item definovanie mat�c stavov�ho modelu $\vec{A}$, $\vec{B}$, $\vec{C}$, $\vec{D}$
+\item vytvorenie objektu stavov�ho modelu pr�kazom "\textbf{ss}"
+\item definovanie peri�dy vzorkovania $T$
+\item diskretiz�cia stavov�ho modelu pomocou "\textbf{c2d}"
+\item definovanie po�iato�n�ho stavu $x0$
+\item rekurentn� simul�cia diskr�tneho syst�mu (presne tak ako ste to robili v TAR II)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Zadanie}
+Vytvorte diskr�tny stavov� model, a urobte simul�ciu syst�mu:\\
+\vspace{4mm}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering a) RLC obvod
+\begin{figure}
+\centering
+\includegraphics[width = 3cm]{rlc_2.eps}
+\end{figure}
+\small
+\begin{eqnarray*}
+\frac{di(t)}{dt} = -\frac{R}{L}i(t) -\frac{1}{LC}\int{i(t)dt}+\frac{1}{L}u_{Z}\\
+u_{C} = \frac{1}{C}\int{i(t)dt} \rightarrow \frac{du_{C}(t)}{dt} = \frac{1}{C}i(t)
+\end{eqnarray*}
+\normalsize
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\centering b) Vertik�lna dynamika vrtuln�ku
+\begin{figure}
+\centering
+\includegraphics[width = 3.5cm]{hover.eps}
+\end{figure}
+\small
+\begin{eqnarray*}
+\frac{d^{2}z}{dt^2} = \frac{1}{m}F\\
+F = T - G
+\end{eqnarray*}
+\normalsize
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\centering a) RLC obvod
+\footnotesize
+\begin{itemize}
+\item odvodenie stavov�ho modelu
+\item stavov� vektor vo forme: $\begin{bmatrix} u_{C}\\ i \end{bmatrix}$
+\item peri�da vzorkovania $T_{s} = 1x10^{-6}s$
+\item parametre $R = 100\varOmega$, $L = 2x10^{-3}H$, $C = 1x10^{-8}F$
+\item urobte diskr�tnu simul�ciu skokovej zmeny nap�tia $u_{Z} = 10V$
+\item urobte diskr�tnu simul�ciu z po�iato�n�ho stavu $\begin{bmatrix} 10 \\ 0 \end{bmatrix}$ pri $u_{Z} = 0V$
+\item simulujte 400 krokov / 400 krokov
+\item do grafu vykreslite v�etky stavy (2)
+\end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\centering b) Vertik�lna dynamika vrtuln�ku
+\footnotesize
+\begin{itemize}
+\item odvodenie stavov�ho modelu
+\item stavov� vektor vo forme: $\begin{bmatrix} z\\ \dot{z} \end{bmatrix}$
+\item peri�da vzorkovania $T_{s} = 0.05s$
+\item parametre $m = 2200kg$, $g = 9.81m/s^2$, $G = mg$
+\item urobte diskr�tnu simul�ciu skokovej zmeny �ahu rotora $T = 30 000N$
+\item urobte diskr�tnu simul�ciu z po�iato�n�ho stavu $\begin{bmatrix} 0 \\ 10 \end{bmatrix}$ pri $T = 0N$
+\item simulujte 40 krokov / 40 krokov
+\item do grafu vykreslite v�etky stavy (2)
+\end{itemize}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\end{document}

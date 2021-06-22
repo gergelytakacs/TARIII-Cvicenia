@@ -1,0 +1,281 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mcode}
+
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{TeÛria automatickÈho riadenia III.}
+\subtitle{CviËenie IX, OhraniËenia a kvadratick˝ problÈm}
+
+\author[] % (optional, use only with lots of authors)
+{G. Tak·cs, G. Batista}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  ⁄stav automatiz·cie, merania a aplikovanej informatiky\\
+  StrojnÌcka fakulta, Slovensk· technick· univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[19.11.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatiz·cia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Na dneönom cviËenÌ}
+\vspace{5mm}
+\begin{itemize}
+\item Zostavenie matÌc ohraniËenia pre MPC
+\item Simul·cia MPC regul·tora pomocou kvadratickÈho programovania\\
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Z predn·öky}
+Minimalizujeme:\\
+\begin{eqnarray*}
+\overrightarrow{\vec{u}}^{\ast}_k=arg\min_{\overrightarrow{\vec{u}}_k} J(\vec{x}_k,\overrightarrow{\vec{u}}_k)\\
+\end{eqnarray*}
+priËom:\\
+\begin{eqnarray*}
+\ubar{u} \leq u_k \leq \bar{u}\\
+\ubar{x} \leq x_k \leq \bar{x}\\
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Z predn·öky}
+\vspace{3mm}
+Celkov˝ problÈm:
+\begin{eqnarray*}
+\min_{\overrightarrow{\vec{u}}_k} J(\vec{x}_k,\overrightarrow{\vec{u}}_k)=\sum^{n_p-1}_{i=0}(\vec{x}^T_{k+i}\vec{Q}\vec{x}_{k+i}+\vec{u}^T_{k+i}\vec{R}\vec{u}_{k+i})+\vec{x}^T_{k+n_p}\vec{P}_f\vec{x}_{k+n_p}\\
+\end{eqnarray*}
+pri
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+\ubar{u} \leq u_{k+i} \leq \bar{u}\\
+\ubar{x} \leq x_{k+i} \leq \bar{x}\\
+x_{k+0} = x_k\\
+x_{k+i+1} = \vec{A}x_{k+i}+\vec{B}u_{k+i}\\
+y_{k+i}=\vec{C}x_{k+i}\\
+u_{k+i}=\vec{K}x_{k+i}\\
+\end{eqnarray*}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+,i&=&0,1,2,...,n_{p}-1\\
+,i&=&1,2,3,...,n_{p}\\[2.6ex]
+,i&\geq& 0\\
+,i&\geq& 0\\
+,i&\geq& n_p\\
+\end{eqnarray*}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Zostavenie matÌc ohraniËenia}
+Transform·cia matematickej podoby kriteri·lnej funkcie z:
+\begin{equation*}
+J_k=\vec{u}^T_k\vec{H}\vec{u}_k+2x^T_k\vec{G}^T\vec{u}_k
+\end{equation*}
+do:
+\begin{equation*}
+f(\vec{u})=\frac{1}{2}\vec{u}^T\vec{H}\vec{u}+\vec{G}^T\vec{u}
+\end{equation*}\\
+teda, $\vec{H}\longrightarrow\vec{H}$ a $\vec{G} \longrightarrow \vec{G}x_k$
+\end{frame}
+
+\begin{frame}{Zostavenie matÌc ohraniËenia}
+A ohraniËenÌ:
+\begin{eqnarray*}
+\ubar{u} \leq u_{k+i} \leq \bar{u}\\
+\ubar{x} \leq x_{k+i} \leq \bar{x}\\
+\end{eqnarray*}
+do
+\begin{equation*}
+\vec{A}_c\vec{u}_k \leq \vec{b}_0+\vec{B}_0x_k
+\end{equation*}
+D· sa napÌsaù,
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+\ubar{u} \leq &u_{k}& \leq \bar{u}\\
+u_k &\leq& \bar{u}\\
+-u_k &\leq& -\ubar{u}\\
+\end{eqnarray*}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+\ubar{x} \leq &x_{k}& \leq \bar{x}\\
+x_k &\leq& \bar{x}\\
+-x_k &\leq& -\ubar{x}\\
+\end{eqnarray*}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Zostavenie matÌc ohraniËenia}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+
+Matice ohraniËenia vstupu:
+\begin{eqnarray*}
+u_k &\leq& \bar{u}\\
+-u_k &\leq& -\ubar{u}\\
+ & \Downarrow &\\
+\begin{bmatrix}
+\vec{I}\\-\vec{I}
+\end{bmatrix}\vec{u}_k&\leq&\begin{bmatrix}
+\vec{1}\bar{u}\\-\vec{1}\ubar{u}
+\end{bmatrix}
+\end{eqnarray*}
+
+\end{column}
+\begin{column}{0.48\textwidth}
+
+Matice ohraniËenia stavov:
+\begin{eqnarray*}
+x_k &\leq& \bar{x}\\
+-x_k &\leq& -\ubar{x}\\
+ & \Downarrow &\\
+ x_{k+1} &=& \vec{M}_ix_k+\vec{N}_i\vec{u}_k\\
+ & \Downarrow &\\
+\begin{bmatrix}
+\vec{N}_i\\-\vec{N}_i
+\end{bmatrix}\vec{u}_k&\leq&\begin{bmatrix}
+\bar{x}\\-\ubar{x}
+\end{bmatrix}+\begin{bmatrix}
+-\vec{M}_i\\\vec{M}_i
+\end{bmatrix}x_k
+\end{eqnarray*}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Zostavenie matÌc ohraniËenia}
+Toto skombinujeme:
+\begin{eqnarray*}
+\begin{bmatrix}
+\vec{I}\\-\vec{I}
+\end{bmatrix}\vec{u}_k&\leq&\begin{bmatrix}
+\vec{1}\bar{u}\\-\vec{1}\ubar{u}
+\end{bmatrix}+\begin{bmatrix}
+ \vec{0}\\\vec{0}
+ \end{bmatrix}x_k\\
+ & + &\\
+ \begin{bmatrix}
+ \vec{N}_i\\-\vec{N}_i
+ \end{bmatrix}\vec{u}_k&\leq&\begin{bmatrix}
+ \bar{x}\\-\ubar{x}
+ \end{bmatrix}+\begin{bmatrix}
+ -\vec{M}_i\\\vec{M}_i
+ \end{bmatrix}x_k\\
+  & \Downarrow &\\
+  \vec{A}_c\vec{u}_k &\leq& \vec{b}_0+\vec{B}_0x_k
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{KvadratickÈ programovanie}
+Toto potom nak‡mime do rieöiËa kvadratickÈho problÈmu:
+\begin{eqnarray*}
+f(\vec{u}_k)&=&\frac{1}{2}\vec{u}_k^T\vec{H}\vec{u}_k+\vec{G}^T\vec{u}_k\\
+\vec{A}_c\vec{u}_k &\leq& \vec{b}_0+\vec{B}_0x_k\\
+\end{eqnarray*}
+
+\mcode{[u_opt, f] = quadprog(H,G,Ac,b0)}
+\mcode{[u_opt, f] = quadprog(H,G*x,Ac,b0+B0*xk)}
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{itemize}
+\item naËÌtajte v·ö identifikovan˝ model nosnÌka
+\item vytvorte LQ regul·tor
+\item vytvorte matice \textbf{M},\textbf{N},\textbf{H},\textbf{G} na z·klade \textbf{Q} a \textbf{R} a pre poËet krokov $n_p = 10$
+\item urobte simul·ciu LQ riadenia nosnÌka so satur·ciou
+\item urobte simul·ciu MPC riadenia s obmedzeniami (bez obmedzenÌ stavov)
+\item porovnajte LQ a MPC
+\end{itemize}
+\end{frame}
+
+\end{document}

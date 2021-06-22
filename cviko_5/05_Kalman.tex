@@ -1,0 +1,248 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie V, Kálmánov filter}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[19.10.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Èo je Kálmánov filter}
+Diskrétny Kálmánov filter rekonštruuje stav systému, prièom minimalizuje varianciu chyby odhadu, t.j. odhaduje stav systému ktorého vıstupnı signál je znaène zašumenı\\[2ex]
+Pouíva sa v prípade keï:
+\begin{itemize}
+\item poznáme dynamiku systému
+\item niektorı zo stavov nie je merate¾nı
+\item máme k dispozícií viac senzorov tej istej velièiny s rozdielnou presnosou
+\item meranı vıstup je zašumenı
+\item poznáme varianciu a kovarianciu merania a procesu 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Èo je Kálmánov filter}
+\begin{figure}
+\centering
+\includegraphics[width = 7cm]{Simulation_Res_SK_noise.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Èo je Kálmánov filter}
+Pre diskrétny systém:
+\begin{eqnarray*}
+\textbf{x}_{k+1}&=&\textbf{Ax}_{k}+\textbf{Bu}_{k}+\textbf{w}_{k}\\
+\textbf{y}_{k}&=&\textbf{Cx}_{k}+\textbf{v}_{k}
+\end{eqnarray*}
+kde $\textbf{w}_{k}$ a $\textbf{v}_{k}$ sú šum procesu a merania\\
+\begin{eqnarray*}
+\textbf{Q}&=&E[\textbf{w}\textbf{w}^{T}]\\
+\textbf{R}&=&E[\textbf{v}\textbf{v}^{T}]
+\end{eqnarray*}
+z toho je $\textbf{Q}$ kovariaèná matica šumu procesu a $\textbf{R}$ je kovariaèná matica šumu merania
+
+\end{frame}
+
+\begin{frame}{Kálmánov filter}
+
+apriórny odhad stavu
+\begin{eqnarray*}
+\textbf{e}^{-}_{k+1}&=&\textbf{x}_{k+1}-\hat{\textbf{x}}^{-}_{k+1}
+\end{eqnarray*}
+aposteriórny odhad stavu
+\begin{eqnarray*}
+\textbf{e}_{k+1}&=&\textbf{x}_{k+1}-\hat{\textbf{x}}_{k+1}
+\end{eqnarray*}
+Kovariancie potom:
+\begin{eqnarray*}
+\textbf{P}^{-}_{k+1}&=&E[\textbf{e}^{-}_{k+1}\textbf{e}^{-T}_{k+1}]\\
+\textbf{P}_{k+1}&=&E[\textbf{e}_{k+1}\textbf{e}^{T}_{k+1}]
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}{Aplikovatelnos filtra}
+Pre vyhodnotenie aplikovatelnosti Kálmánovho filtra je nutné vyšetri pozorovate¾nos systému:
+\begin{eqnarray*}
+Ob = 
+\begin{bmatrix}
+C\\
+CA\\
+CA^2\\
+\vdots\\
+CA^{n-1}
+\end{bmatrix}
+\end{eqnarray*}
+kde hodnos matice $Ob$ musí by rovná hodnosti matice dynamiky systému
+\end{frame}
+
+\begin{frame}{Kálmánov filter}
+chceme dosta aposteriórny odhad:
+\begin{eqnarray*}
+\hat{\textbf{x}}_{k+1}&=&\hat{\textbf{x}}^{-}_{k+1}+\textbf{K}(\textbf{y}_{k}-\textbf{C}\hat{\textbf{x}}^{-}_{k+1})
+\end{eqnarray*}
+kde $\textbf{K}$ je Kálmánovo zosilnenie
+\begin{eqnarray*}
+\textbf{K}_{k}&=&\textbf{P}^{-}_{k}\textbf{C}^{T}(\textbf{C}\textbf{P}^{-}_{k}\textbf{C}^{T}+\textbf{R})^{-1}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Pre nás}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 5cm]{kalman_schema.eps}
+\end{figure}
+\begin{eqnarray*}
+\textbf{R}&=&\textbf{C}\textbf{C}^{T}diag(\sigma^2_{y})\\
+\textbf{Q}&=&\textbf{B}\textbf{B}^{T}diag(\sigma^{2}_{u})\\
+\textbf{P}_{0}&=& \textbf{Q}
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\textbf{Prediktor}
+\begin{eqnarray*}
+\hat{\textbf{x}}^{-}_{k+1}&=&\textbf{A}\hat{\textbf{x}}_{k}+\textbf{Bu}_{k}\\
+\textbf{P}^{-}_{k}&=&\textbf{A}\textbf{P}_{k}\textbf{A}^{T}+\textbf{Q}
+\end{eqnarray*}
+
+\textbf{Korektor}
+\begin{eqnarray*}
+\textbf{K}_{k}&=&\textbf{P}^{-}_{k}\textbf{C}^{T}(\textbf{C}\textbf{P}^{-}_{k}\textbf{C}^{T}+\textbf{R})^{-1}\\
+\hat{\textbf{x}}_{k+1}&=&\hat{\textbf{x}}^{-}_{k+1}+\textbf{K}_{k}(\textbf{y}_{k}-\textbf{C}\hat{\textbf{x}}^{-}_{k+1})\\
+\textbf{P}_{k}&=&(\textbf{I}-\textbf{K}_{k}\textbf{C})\textbf{P}^{-}_{k}
+\end{eqnarray*}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{itemize}
+\item naèítajte váš identifikovanı model a LQ regulátor z predošlej hodiny
+\item nastavte maticu merania na meranie zrıchlenia $\textbf{C}=\begin{bmatrix}
+-\frac{k}{m}&-\frac{b}{m}
+\end{bmatrix}$
+\item nastavte smerodajnú odchılku šumu merania na $\sigma_{y}=10m/s^2$
+\item nastavte smerodajnú odchılku šumu procesu na $\sigma_{u}=10V$
+\item urobte diskrétnu simuláciu saturovaného LQ riadenia prièom:
+\begin{itemize}
+\item šum vstupu a vıstupu simulujte pomocou funkcie "\textbf{random}" ktorej argument je relevantná smerodajná odchılka
+\item vstup LQ regulátora je vıstup Kálmánovho filtra (to znamená e si ten filter musíte naprogramova)
+\end{itemize}
+\item graficky porovnajte reálny vıstup systému, nameranı(zašumenı) signál, odhad vıstupu Kálmánovım filtrom
+\item taktie porovnajte vypoèítanı vstup systému a reálny(zašumenı)
+\item graficky porovnajte frekvenèné charakteristiky spomenutıch troch vıstupnıch signálov
+\item kód dobre okomentujte a grafické vıstupy spravte tak aby sa v nich dalo orientova
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Schéma simulácie}
+\begin{figure}
+\includegraphics[width = \textwidth]{schema.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Oèakávanı vıstup}
+Odozva:
+\begin{figure}
+\includegraphics[width = \textwidth]{ocakavany_vysledok.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Oèakávanı vıstup}
+Frekvenèná charakteristika:
+\begin{figure}
+\includegraphics[width = \textwidth]{spektrum.eps}
+\end{figure}
+\end{frame}
+
+\end{document}

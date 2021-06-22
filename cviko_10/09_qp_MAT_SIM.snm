@@ -1,0 +1,11 @@
+\beamer@slide {min_prob}{2}
+\beamer@slide {limit_general}{2}
+\beamer@slide {limit_equality}{2}
+\beamer@slide {matlab_fcn}{7}
+\beamer@slide {hessian}{10}
+\beamer@slide {hes_lba}{10}
+\beamer@slide {hes_lb}{10}
+\beamer@slide {QProblem_sim}{27}
+\beamer@slide {QProblemB_sim}{28}
+\beamer@slide {SQProblem_sim}{29}
+\beamer@slide {MPC_sim}{31}

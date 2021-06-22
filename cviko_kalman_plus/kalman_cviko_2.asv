@@ -1,0 +1,101 @@
+%% LQ regulacia polohy s kalmanovym filtrom
+clear, clc
+
+%% system
+Ts = 0.05;
+F = [0 1 0;
+     0 0 1;
+     0 0 0];
+G = [0; 0; 1];
+C = eye(3);
+C0 = [1 0 0;
+      0 0 1];
+C1 = [1 0 0];
+C2 = [0 0 1];
+sys = ss(F,G,C,[]);
+sysd = c2d(sys, Ts);
+A = sysd.a;
+B = sysd.b;
+Qlq = C'*C;
+Rlq = 0.1;
+Klq = dlqr(A, B, Qlq, Rlq);
+
+%% kalman
+std_du = 1;
+std_acc = 1;
+std_pos = 0.5;
+Rk = (C0*C0')*[std_pos^2 0;
+               0 std_acc^2];
+Qk = (B*B')*(std_du)^2;
+P = Qk;
+
+%% inicializacia
+n = 199;
+X0 = [0;0;0];
+X = zeros(3,n+1);
+Xz = [10;0;0];
+X(:,1) = X0;
+
+du = zeros(1,n);
+dus = zeros(1,n);
+u = zeros(1,n);
+us = zeros(1,n);
+
+Xk0 = [0;0;0];
+Xk = zeros(3,n+1);
+Xk(:,1) = Xk0;
+Yk = zeros(2,n);
+
+Ym = zeros(2,n);
+
+%% simulacia
+for i = 1:n
+    %% meranie
+    Ym(:,i) = C0 * [random('norm', X(1,i), std_pos);
+                                                  0;
+                    random('norm', X(3,i), std_acc)];
+    if i == 1
+        duk = 0;
+    else
+        duk = du(i-1);
+    end
+    %% kalman, prediktor
+    Xk(:,i+1) = A*Xk(:,i) + B*duk;
+    Yk(:,i) = C0*Xk(:,i+1);
+    P = A*P*A' + Qk;
+    %% kalman, korektor
+    Kk = P*C0'/(C0*P*C0' + Rk);
+    Xk(:,i+1) = Xk(:,i+1) + Kk*(Ym(:,i) - Yk(:,i));
+    P = (eye(3) - Kk*C0)*P;
+    %% regulator
+    e = Xz - Xk(:,i+1);
+    du(i) = Klq*e;
+    dus(i) = random('norm', du(i), std_du);
+    if i == 1
+        u(i) = du(i);
+        us(i) = dus(i);
+    else
+        u(i) = u(i-1) + du(i);
+        us(i) = us(i-1) + dus(i);
+    end
+    %% simulacia systemu
+    X(:,i+1) = A*X(:,i) + B*dus(i);
+end
+
+%% vykreslenie vysledkov
+figure(1)
+
+subplot 221
+plot(X(1,:))
+hold on
+plot(Ym(1,:),'r')
+plot(Xk(1,:),'g')
+
+
+
+
+
+
+
+
+

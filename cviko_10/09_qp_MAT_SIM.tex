@@ -1,0 +1,468 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mcode}
+\usepackage{hyperref}
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{ }
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[19.11.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% co bude obsah
+%
+% riesice kvadratickeho problemu
+% aku ma formu QP
+% quadprog 	->	matlab, m-funkcia, neda sa kompilovat, zlozity->viac funckii
+% qpOASES 	-> 	pisane v C++, da sa pouzit na viac platformach, riesi iba pomocou active-set
+%		    	pouziva sa v kompilovanej, binarnej forme, vhodne pre pouzitie v MPC, rychlejsie
+%			 	QProblemB, QProblem, SQProblem
+%				hotstart -> na akom principe funguje
+% 			 	options -> set to mpc
+%			 	da sa pouzit aj pre single-precision
+% pouzitie v matlabe
+% 	quadprog	opis syntax
+%	qpOASES		C++ -> najprv treba skompilovat, potom opis syntax
+%					-> vyhoda - hotstart sequence, opis ako funguje (preloz z manualu)
+% pouzitie v simulinku
+%				ako funguje simulink
+%				ako pouzit matlab function
+%	quadprog	neda sa kompilovat, tak treba nastavit compiler tak aby nekompiloval, ale spustil matlab interpreter
+% 	qpOASES		treba skompilovat pridruzenu s-funkciu, potom v binarnom formate sa da pouzit. 
+%				
+
+\begin{frame}
+Ak kvadratickı problém definujeme ako,
+
+\begin{eqnarray}
+\label{min_prob}
+\min\limits_{\mathbf{x}}\enspace & \frac{1}{2}\textbf{x}^{T}\textbf{H}\textbf{x} + \textbf{x}^{T}\textbf{g},\\
+\label{limit_general}
+s.t. & \textbf{A}_c\textbf{x} \leq \textbf{b}_0\\
+\label{limit_equality}
+ & \textbf{A}_{e}\textbf{x} = \textbf{b}_{e}\\
+ %\label{limit_input}
+ %& \textbf{l}_b \leq \textbf{x} \leq \textbf{u}_b
+\end{eqnarray}
+
+máme k dispozícií viacero softvérovıch nástrojov na jeho riešenie.
+\end{frame}
+
+\begin{frame}
+V softvérovom prostredí MATLAB môeme poui funkciu \mcode{quadprog} ktorá rieši problém tvaru z rovníc \ref{min_prob} a \ref{limit_equality}. Funkcia \mcode{quadprog} poskytuje monos rieši kvadratickı problém metódami 
+\begin{itemize}
+\item vnútorného bodu (interior point),
+\item aktívnej mnoiny (active set),
+\item regiónu dôvery
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}
+Prispôsobite¾nos tejto funkcie nám spôsobuje e nieje ideálna na robenie vıpoètov kvadratického problému v aplikácií prediktívneho riadenia s ve¾mi krátkymi periódami vzorkovania.\\
+Funkcia \mcode{quadprog} je zloitá m-funckia obsahujúca iné m-funkcie a funckie v binárnom formáte, ktorú nieje moné preloi ako celok do binárneho kódu. Taktie nepatrí medzi funkcie kompatibilné so Simulinkom.
+\end{frame}
+
+
+\begin{frame}[fragile]
+Syntax pouitia tohoto príkazu je nasledovnı:
+\begin{lstlisting}
+[X,fval,exitflag,output,lambda] =
+			     quadprog(H,f,A,b,Aeq,beq,LB,UB,X0,options)
+
+ min 0.5*x'*H*x + f'*x
+ subject to:  A*x <= b,
+              Aeq*x = beq,
+              LB <= X <= UB.
+\end{lstlisting}
+kde argumenty od \mcode{H} po \mcode{UB} prislúchajú definovanım ohranièeniam problému, \mcode{X0} je nami daná poèiatoèná hodnota na štart algoritmu a objekt \mcode{options} obsahuje nastavenia riešièa. Tieto nastavenia sa vytvárajú pomocou príkazu \mcode{optimoptions}. ¼ubovo¾né argumenty je moné vynecha dosadením prázdnej mnoiny \mcode{[]} na miesto vybraného argumentu.
+\end{frame}
+
+\begin{frame}
+Vıstupné hodnoty funkcie sú
+\begin{itemize}
+\item \mcode{X}, 		vektor optimálnych vstupov 
+\item \mcode{fval}, 	funkèná hodnota kriteriálnej funkcie
+\item \mcode{exitflag}, informácia o skonèení algoritmu
+\item \mcode{output}, 	informácia o optimalizácií
+\item \mcode{lambda}, 	Lagrangeove súèinitele vısledku
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Ako poui \mcode{quadprog} v Simulinku?\\[2ex]
+Simulink pracuje na princípe interpretovania blokovej schémy a následnej kompilácie do binárneho kódu. Keïe \mcode{quadprog} nieje dostupnı ako blok v kninici Simulinku, tak ho tam je potrebné vloi cez blok MATLAB Function Block.
+\begin{figure}
+\label{matlab_fcn}
+\centering
+\includegraphics[width=2cm]{matlab_fcn.png}
+\caption{Blok MATLAB Function v Simulinku}
+\end{figure}
+Toto nám umonuje spúša písanı MATLAB kód priamo v Simulinku.
+\end{frame}
+
+\begin{frame}
+Tento kód však musí by kompilovate¾nı Simulinkom. Preto je v òom treba správne alokova pamä pre jeho vnútorné a vıstupné premenné a taktie treba dba na pouitie kompatibilnıch MATLAB funkcií. V prípade, keï nieje moné poui takúto kompatibilnú funkciu, existuje monos ako poveda Simulinku aby sa niektore funkcie nekompilovali a namiesto toho sa zavolal MATLAB interpreter. Toto sa robí pomocou príkazu \mcode{coder.extrinsic}.
+
+\end{frame}
+
+\begin{frame}[fragile]
+Príklad takéhoto kódu je nasledovnı:
+\begin{lstlisting}
+function u = fcn(H,G,x,Ac,b0)
+%#codegen
+
+u=double(ones(30,1));
+
+% MPC with constrains
+coder.extrinsic('optimset','quadprog');
+options = optimset('Display','off','Algorithm','active-set');
+[u_ast,f]=quadprog(H,G*x,Ac,b0,[],[],[],[],[],options);
+
+u=u_ast;
+
+\end{lstlisting}
+\end{frame}
+% Rozdelene na quadprog a qpOASES
+% quadprog:
+% aku ma formu QP
+% quadprog 	->	matlab, m-funkcia, neda sa kompilovat, zlozity->viac funckii
+% pouzitie v matlabe
+% 	quadprog	opis syntax
+% pouzitie v simulinku
+%				ako funguje simulink
+%				ako pouzit matlab function
+%	quadprog	neda sa kompilovat, tak treba nastavit compiler tak aby nekompiloval, ale spustil matlab interpreter
+
+\begin{frame}
+Ïalšia monos ako rieši kvadratickı problém je pouitie softvérového balíku qpOASES (quadratic programming Online Active-Set Strategy)\cite{Ferreau2014}. Tento softvér rieši problém v tvare:
+\begin{eqnarray}
+\label{hessian}
+\min\limits_{\mathbf{x}}\enspace & \frac{1}{2}\textbf{x}^{T}\textbf{Hx} + \textbf{x}^{T}\textbf{g}(w_{0}),\\
+\label{hes_lba}
+s.t. & \textbf{lbA}(w_{0}) \leq \textbf{Ax} \leq \textbf{ubA}(w_{0}),\\
+\label{hes_lb}
+ & \textbf{lb}(w_{0}) \leq \textbf{x} \leq \textbf{ub}(w_{0})
+\end{eqnarray}
+kde je Hessian symetrická a pozitívne (semi-)definitná matica a vektor gradientu spolu s vektormi ohranicenia sú lineárne závislé na parametri $w_0$ 
+
+\end{frame}
+
+\begin{frame}
+Softvérovı balík qpOASES je písanı v jazyku C++, èo ho umonuje poui na širšej škále platforiem. Vyaduje si však menšie úprvy nato aby bol pouite¾nı. Tento riešiè je pouíva stratégiu aktívnej mnoiny a je optimalizovanı pre podávanie vysokıch vıkonov pomocou tejto metódy.\\ Jeho najväèšou vıhodou je pouitie sekvenèného vıpoètu kvadratického problému, tzv. hotstart. To znamená e ak je riešenie nasledujúceho problému v sekvencií lineárne závislé na predošlom vısledku, tak tento vısledok môeme poui ako poèiatoènı odhad nasledujúceho problému. Z tohoto je jasné e táto metóda je vhodná pre pouitie v prediktívnom riadení, keïe to umoòuje podstatne zníi poèet iterácií potrebnıch k získaniu vısledku a tım skráti vıpoètovı èas.
+\end{frame}
+
+\begin{frame}
+qpOASES ponúka tri triedy pouitia tohoto riešièa:
+\begin{itemize}
+\item QProblem	- zjednodušenı štandardnı tvar
+\item QProblemB	- jednoduché ohranièenia
+\item SQProblem	- štandardnı tvar
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Trieda QProblem rieši problém v štandardnom tvare, v prípade e sa matice $H$ a $A$ nemenia.
+\begin{eqnarray*}
+\min\limits_{\mathbf{x}}\enspace & \frac{1}{2}\textbf{x}^{T}\textbf{Hx} + \textbf{x}^{T}\textbf{g}(w_{0}),\\
+s.t. & \textbf{lbA}(w_{0}) \leq \textbf{Ax} \leq \textbf{ubA}(w_{0}),\\
+ & \textbf{lb}(w_{0}) \leq \textbf{x} \leq \textbf{ub}(w_{0})
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+Trieda QProblemB rieši kvadratickı problém v ktorom existujú iba jednoduché ohranièenia a Hessian je nemennı
+\begin{eqnarray*}
+\min\limits_{\mathbf{x}}\enspace & \frac{1}{2}\textbf{x}^{T}\textbf{Hx} + \textbf{x}^{T}\textbf{g}(w_{0}),\\
+ & \textbf{lb}(w_{0}) \leq \textbf{x} \leq \textbf{ub}(w_{0})
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+Trieda SQProblem rieši štandardnı problém v ktorom je monos zmeny všetkıch parametrov z kroku na krok. Táto varianta je vhodná pre pouite napríklad v regulácií èasovo variantnıch systémov s meniacimi sa ohranièeniami.
+\begin{eqnarray*}
+\min\limits_{\mathbf{x}}\enspace & \frac{1}{2}\textbf{x}^{T}\textbf{Hx} + \textbf{x}^{T}\textbf{g}(w_{0}),\\
+s.t. & \textbf{lbA}(w_{0}) \leq \textbf{Ax} \leq \textbf{ubA}(w_{0}),\\
+ & \textbf{lb}(w_{0}) \leq \textbf{x} \leq \textbf{ub}(w_{0})
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+qpOASES ponúka rôzne rozhrania pre pouitie tohoto riešièa. Na vıber máme z:\\[2ex]
+\begin{itemize}
+\item C
+\item MATLAB
+\item Simulink
+\item Octave
+\item Scilab
+\item python
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Pre pouitie v prostredí MATLAB/Simulink je potrebné ma nainštalovanı a nakonfigurovanı compiler C++. qpOASES je dostupnı zo stránky \url{https://projects.coin-or.org/qpOASES/} zadarmo.
+\end{frame}
+
+\begin{frame}
+
+Balíèek funkcií pre MATLAB obsahuje funkcie:
+\begin{itemize}
+\item \mcode{qpOASES(...);} pre riešenie štandardného kvadratického problému
+\item \mcode{qpOASES\_sequence(...);} pre riešenie sekvenèného kvadratického problému
+\item \mcode{qpOASES\_options(...);} pre vytvorenie nastavení riešièa
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+Syntax štandardného kvadratického problému qpOASES je nasledovnı:
+\begin{lstlisting}
+               min   1/2*x'Hx + x'g
+               s.t.  lb  <=  x <= ub
+                     lbA <= Ax <= ubA  {optional}
+                     
+   [x,fval,exitflag,iter,lambda,auxOutput] = 
+      qpOASES( H,g,A,lb,ub,lbA,ubA{,options{,auxInput}} )      
+\end{lstlisting}
+kde argumenty od \mcode{H} po \mcode{ubA} prislúchajú kvadratickému problému a jeho ohranièeniam. Dodatoèné argumenty sú nastavenia riešièa a vedlajšie vstupy ktoré sa postúpia riešièu. Matica \mcode{H} musí by symetrická a vektory od \mcode{g} po \mcode{ubA} musia by ståpcové.\\ Maticu \mcode{A} staèí inicializova pre jednu stranu ohranièenia, napríklad pre horné ohranièenie, keïe qpOASES sám vytvorí potrebnú maticu pre celkové ohranièenie z hornej aj dolnej strany. Je taktie moné inicializova zjednodušenı problém ktorı neobsahuje zovšeobecnené hranièné podmienky vynechaním argumentov \mcode{A, lbA, ubA}. 
+\end{frame}
+
+\begin{frame}
+Vıstupné hodnoty funckie qpOASES sú:
+\begin{itemize}
+\item \mcode{x}, optimálne primárne riešenie (ak \mcode{exitflag==0})
+\item \mcode{fval}, optimálna hodnota cie¾ovej funkcie (ak \mcode{exitflag==0})
+\item \mcode{exitflag}, informácia o spôsobe ukonèenia algoritmu
+\item \mcode{iter}, poèet iterácií ktoré si vyadovalo riešenie]
+\item \mcode{lambda}, Lagrangeove súèinitele vısledku
+\item \mcode{auxOutput}, štruktúra obsahujúca dodatoèné vıstupy
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Nastavenia riešièa je moné vytvori príkazom \mcode{qpOASES_options(...)} v ktorom je moné nastavi ¾ubovo¾né parametre. qpOASES ale ponúka tri základné skupiny nastavení ktoré môeme vyui. Sú to:
+\begin{itemize}
+\item \mcode{options = qpOASES_options( 'default' );} pre štandardné nastavenie
+\item \mcode{options = qpOASES_options( 'reliable' );} pre nastavenie spo¾ahlivej konfigurácie riešièa
+\item \mcode{options = qpOASES_options( 'MPC' );} pre nastavenie rıchleho riešenia kvadratického problému
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Sekvenènı kvadratickı problém je moné vypoèíta pomocou príkazu \mcode{qpOASES_seuence(...)}. Priebeh jeho riešenia je moné rozdeli do troch skupín. 
+\begin{itemize}
+\item incializácia problému (vytvorenie objektu kvadratického programovania)
+\item sekvenèné riešenie (nadväzujúce problémy sa riešia pomocou vıstupu predošlého)
+\item ukonèenie riešenia kvadratického problému (uvo¾nenie operaènej pamäte)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+
+Sekvenènı problém inicializujeme podobne ako štandardnı problém. Avšak je potrebné prida ako vıstupnı argument do ktorého uloíme objekt kvadratického problému. Syntax je nasledovnı:
+\begin{lstlisting}
+  [QP,x,fval,exitflag,iter,lambda,auxOutput] = ...
+   qpOASES_sequence('i',H,g,A,lb,ub,lbA,ubA{,options{,auxInput}})
+\end{lstlisting}
+kde parameter \mcode{QP} je spomenutı objekt a argument \mcode{'i'} oznamuje funkcií e sa jedná o inicializáciu problému.
+\end{frame}
+
+\begin{frame}
+V ïalšom kroku máme na vıber z troch moností. V závislosti od prvého argumentu môeme spusti:
+\begin{itemize}
+\item \mcode{qpOASES_sequence('h',QP,g,lb,ub,lbA,ubA,options)}, štandardnı sekvenènı vıpoèet, tzv. hotstart, v ktorom aktualizujeme gradient a ohranièenia problému
+\item \mcode{qpOASES_sequence('m',QP,H,g,A,lb,ub,lbA,ubA,options)}, sekvenènı vıpoèet s premenlivımi maticami \mcode{H,g} a taktie s aktualizovanımi ohranièeniami
+\item \mcode{qpOASES_sequence('e',QP,g,lb,ub,lbA,ubA,options)}, sekvenènı problém s rovnostnımi ohranièeniami
+\end{itemize}
+Ïalej je potrebé prida ako argument funkcie objekt kvadratického problému \mcode{QP}. Charakteristikou tohoto sekvenèného vıpoètu je to e poèiatoènı odhad vısledku je vlastne vısledok predošlého kroku.
+\end{frame}
+
+\begin{frame}[fragile]
+V poslednom kroku je nutné zavola funkciu vo forme
+\begin{lstlisting}
+qpOASES_sequence( 'c',QP )
+
+\end{lstlisting}
+nato aby sa zmazal objekt \mcode{QP} a uvolnila sa alokovaná pamä.
+\end{frame}
+
+\begin{frame}
+Pre pouitie v prostredí Simulink je najskôr treba nastavi simulaèné parametre riešièa modelu. Je nutné nastavi diskrétny riešiè s fixnım integraènım krokom.\\ Ïalej treba tie skompilova S-funkciu qpOASES do binárneho formátu. Takımto spôsobom dostaneme tri funkcie:
+\begin{itemize}
+\item \mcode{QProblem}
+\item \mcode{QProblemB}
+\item \mcode{SQProblem}
+\end{itemize}
+Pri tıchto však nemáme k dispozícií sekvenènı typ riešenia.\\ 
+
+\end{frame}
+
+\begin{frame}
+Štandardná forma qpOASES má podobu:
+\begin{figure}
+\label{QProblem_sim}
+\centering
+\includegraphics[width=7cm]{QProblem_sim.png}
+\caption{Blok QProblem v Simulinku}
+\end{figure}
+do ktorej vstupujú vektory ohranièenia. Matice \mcode{H,A} sú vnútorné parametre funkcie ktoré treba explicitne definova.
+\end{frame}
+
+\begin{frame}
+Forma qpOASES s jendoduchımi ohranièeniami má podobu:
+\begin{figure}
+\label{QProblemB_sim}
+\centering
+\includegraphics[width=7cm]{QProblemB_sim.png}
+\caption{Blok QProblemB v Simulinku}
+\end{figure}
+do ktorej vstupujú vektory ohranièenia. Matica \mcode{H} je vnútornı parameter funkcie ktorú treba explicitne definova.
+\end{frame}
+
+\begin{frame}
+Posledná forma bloku má podobu:
+\begin{figure}
+\label{SQProblem_sim}
+\centering
+\includegraphics[width=6.5cm]{SQProblem_sim.png}
+\caption{Blok SQProblem v Simulinku}
+\end{figure}
+V tomto bloku niesú definované iadne vnútorné parametre. Všetky nám prichádzajú do bloku ako premenlivé argumenty
+\end{frame}
+
+\begin{frame}
+Je potrebné poznamena e v tomto prípade je treba všetky vstupné parametre premeni do vektorovej podoby, t.j. matice \mcode{H,A} je nutné prepísa do jedného vektora.\\
+Ïalej treba spomenú e niektoré parametre tohoto bloku je potreba nastavi ešte pri kompilácií S-funkcií (QProblem.cpp). Tieto parametre sú:
+\begin{itemize}
+\item vzorkovacia perióda (-1 pre dedenú zo Simulinku)
+\item poèet vstupov systému, t.j. vıstupov bloku QProblem
+\item maximálny poèet iterácií
+\item typ pouívaného Hessianu
+\end{itemize}
+\end{frame}
+% Rozdelene na quadprog a qpOASES
+% qpOASES:
+% aku ma formu QP
+% qpOASES 	-> 	pisane v C++, da sa pouzit na viac platformach, riesi iba pomocou active-set
+%		    	pouziva sa v kompilovanej, binarnej forme, vhodne pre pouzitie v MPC, rychlejsie
+%				hotstart -> na akom principe funguje
+%			 	QProblemB, QProblem, SQProblem
+%				
+% 			 	options -> set to mpc
+%			 	da sa pouzit aj pre single-precision
+% pouzitie v matlabe
+%	qpOASES		C++ -> najprv treba skompilovat, potom opis syntax
+%					-> vyhoda - hotstart sequence, opis ako funguje (preloz z manualu)
+% pouzitie v simulinku
+% 	qpOASES		treba skompilovat pridruzenu s-funkciu, potom v binarnom formate sa da pouzit
+
+\begin{frame}
+Na nasledujúcom diagrame je zobrazenı príklad pouitia qpOASES pre všeobecnı problém MPC. 
+\begin{figure}
+\label{MPC_sim}
+\centering
+\includegraphics[width=8cm]{schema.eps}
+\caption{Príklad MPC v Simulinku}
+\end{figure}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+\frametitle{Bibliografia}
+\bibliographystyle{plain}
+\bibliography{Batee_bibliography}
+\end{frame}
+
+
+\end{document}

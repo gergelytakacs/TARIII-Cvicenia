@@ -1,0 +1,425 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input NewComm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+%\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+%\usepackage{multirow}
+\usepackage{epstopdf}
+%\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mcode}
+\usepackage{movie15}
+
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie X, MPC polohovanie bremena eriavu}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[5.12.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Na dnešnom cvièení}
+Dnes si urobíme regulátor polohovania bremena eriavu so všetkımi obmedzeniami. K tomu budeme potrebova:
+\vspace{4mm}
+\begin{itemize}
+\item Odvodenie matematického modelu vozíka s kyvadlom
+\item Nelineárna simulácia dynamiky mechanického systému
+\item Zostavenie lineárneho LQ regulátora so saturáciami
+\item Zostavenie lineárneho MPC regulátora s obmedzeniami vstupov a stavov
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Odvodenie modelu}
+
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+Mechanickı model:
+\begin{figure}
+\centering
+\includegraphics[width = 3cm]{zeriav.eps}
+\end{figure}
+prièom
+\begin{eqnarray*}
+x_2 & = & x_1 + l\sin\phi \\
+y_2 & = & l(1-\cos\phi)
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+Kinetická energia systému:
+\begin{equation*}
+E_k = \frac{1}{2}m_1\dot{x}_1^2 + \frac{1}{2}m_2(\dot{x}_2^2 + \dot{y}_2^2)
+\end{equation*}
+Potenciálna energia systému:
+\begin{equation*}
+E_p = m_2gl(1-\cos\phi)
+\end{equation*}
+Disipaèná energia systému:
+\begin{equation*}
+D = 0
+\end{equation*}
+Zovšeobecnené sily:
+\begin{equation*}
+Q_1 = F, Q_2 = 0
+\end{equation*}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Odvodenie modelu}
+Nato aby sme dostali matematickı model systému dosadíme energie a sily do Langrangeovej rovnice II. druhu:
+\begin{equation*}
+\frac{d}{dt}\left(\frac{\partial{E}_k}{\partial\dot{q}_j}\right) - \frac{\partial{E}_k}{\partial{q}_j} + \frac{\partial{D}}{\partial{\dot{q}}_j} + \frac{\partial{E}_p}{\partial{q}_j} = Q_j
+\end{equation*}
+Po dosadení a derivovaní dostávame nelineárny systém rovníc:
+\begin{eqnarray*}
+(m_1+m_2)\ddot{x}_1 + m_2l\cos\phi\ddot{\phi} & = & F\\
+m_2l\cos\phi\ddot{x}_1 + m_2l^2\ddot{\phi} & = & -m_2gl\sin\phi
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}{Odvodenie modelu}
+Pohybové rovnice v maticovom tvare:
+\begin{eqnarray*}
+\vec{M}_N\ddot{\vec{q}}  & = & \vec{f}_N\\
+\left[
+\begin{array}{cc}
+(m_1+m_2) & m_2l\cos\phi \\
+m_2l\cos\phi & m_2l^2
+\end{array}
+\right]
+\left[\begin{array}{c} \ddot{x}_1 \\ \ddot{\phi}\end{array}\right]
+& = &
+\left[
+\begin{array}{c}
+F\\
+-m_2gl\sin\phi
+\end{array}
+\right]
+\end{eqnarray*}
+Takıto nelineárny model je vhodnı na simuláciu. Je však potrebné diskrétne integrova zrıchlenia a rıchlosti v kadom simulaènom kroku. Pre potrebu zostavenia regulátora linearizujeme tento systém  pri podmienke $\phi \in (-5^\circ, 5^\circ)$
+
+\begin{eqnarray*}
+\vec{M}_L\ddot{\vec{q}}  & = & \vec{f}_L\\
+\left[
+\begin{array}{cc}
+(m_1+m_2) & m_2l \\
+m_2l & m_2l^2
+\end{array}
+\right]
+\left[\begin{array}{c} \ddot{x}_1 \\ \ddot{\phi}\end{array}\right]
+& = &
+\left[
+\begin{array}{c}
+F\\
+-m_2gl\phi
+\end{array}
+\right]
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Odvodenie modelu}
+Linearizovanı systém prepíšeme do tvaru:
+\begin{eqnarray*}
+\vec{M}\ddot{\vec{q}}  &+& \vec{K}\vec{q}  =  \vec{f}u\\
+\left[
+\begin{array}{cc}
+(m_1+m_2) & m_2l \\
+m_2l & m_2l^2
+\end{array}
+\right]
+\left[\begin{array}{c} \ddot{x}_1 \\ \ddot{\phi}\end{array}\right]
+&+&
+\left[
+\begin{array}{cc}
+0 & 0 \\
+0 & m_2gl
+\end{array}
+\right]
+\left[\begin{array}{c} x_1 \\ \phi\end{array}\right]
+ = 
+ \left[\begin{array}{c} 1 \\ 0 \end{array}\right]
+ F
+\end{eqnarray*}
+Nato aby sme tento lineárny systém previedli do tvaru stavového modelu je potrebné urobi ešte nasledovné transformácie:
+\begin{eqnarray*}
+\vec{M}\ddot{\vec{q}}  + \vec{K}\vec{q} & = & \vec{f}u \qquad \qquad / \vec{M}^{-1}\\
+\vec{I}\ddot{\vec{q}} +  \vec{M}^{-1}\vec{K}\vec{q} & = & \vec{M}^{-1}\vec{f}u\\
+\ddot{\vec{q}} & = & -\vec{M}^{-1}\vec{K}\vec{q} + \vec{M}^{-1}\vec{f}u
+\end{eqnarray*}
+Tu si oznaèíme $ -\vec{M}^{-1}\vec{K} = \vec{F}_1 $, $ \vec{M}^{-1}\vec{f} = \vec{G}_1 $ a $u = F$
+\end{frame}
+
+\begin{frame}{Stavovı model}
+Následne rozšírime stavovı vektor o rıchlos a uhlovú rıchlos a dostaneme stavovı model v tvare:
+\begin{equation*}
+\dot{\vec{x}} = \vec{F} \vec{x} + \vec{G}u
+\end{equation*}
+Keïe sa nám nechce poèíta analyticky inverziu matice $\vec{M} $, rozpíšeme tento model v maticovom tvare prièom $\vec{F}_1$ a $\vec{G}_1$ riešime v Matlab-e.
+\begin{eqnarray*}
+\left[\begin{array}{c} \dot{x}_1 \\ \ddot{x}_1 \\ \dot{\phi} \\ \ddot{\phi}\end{array}\right]
+=
+\left[
+\begin{array}{cccc}
+0 & 1 & 0 & 0 \\
+\vec{F}_1(1,1) & 0 & \vec{F}_1(1,2) & 0 \\
+0 & 0 & 0 & 1 \\
+\vec{F}_1(2,1) & 0 & \vec{F}_1(2,2) & 0
+\end{array}
+\right]
+\left[\begin{array}{c} x_1 \\ \dot{x}_1 \\ \phi \\ \dot{\phi}\end{array}\right]
++
+\left[\begin{array}{c} 0 \\ \vec{G}_1(1) \\ 0 \\ \vec{G}_1(2)\end{array}\right]
+u
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Nelineárna simulácia}
+Pre uskutoènenie nelineárnej simulácie potrebujeme najskôr definova poèiatoènı stav $\dot{\vec{q}}$ a $\vec{q}$. Potom je treba prepoèíta matice $\vec{M}_N$ a $\vec{f}_N$, vypoèíta $\ddot{\vec{q}}$ a potom vısledok integrova v èase. Algoritmus takého cyklu vyzerá nasledovne: 
+
+\vspace{4mm}
+
+\hspace{3mm}$\vec{q}_0 = [...]$ \\
+\hspace{3mm}$\dot{\vec{q}}_0 = [...]$\\
+cyklus: \\
+\hspace{3mm}$ \vec{M}_N = [...]$\\
+\hspace{3mm}$ \vec{f}_N = [...]$\\
+\hspace{3mm}$ \ddot{\vec{q}}_{k+1} = \vec{M}_N^{-1}\vec{f}_N$\\
+\hspace{3mm}$ \dot{\vec{q}}_{k+1} = \dot{\vec{q}}_{k} + \ddot{\vec{q}}_{k+1}dt$\\
+\hspace{3mm}$ \vec{q}_{k+1} = \vec{q}_{k} + \dot{\vec{q}}_{k+1}dt$\\
+
+\end{frame}
+
+\begin{frame}{Procesné obmedzenia}
+
+Zavedieme 3 druhy obmedzení:
+\begin{itemize}
+\item obmedzenie absolútnej ve¾kosti sily pôsobiacej na vozík $u\in(-10,10)$, kvôli maximálnemu momentu pohonov
+\item obmedzenie prírastku sily pôsobiacej na vozík $du\in(-5,5)$, aby sme sa vyhli neiadanım prúdovım špièkám v pohone
+\item obmedzenie vıkyvového uhla bremena $\phi \in (-5^\circ, 5^\circ)$, aby sa zamedzilo nelineárnemu chovaniu systému. Zaruèí sa tım správna funkènos lineárneho regulátora
+\end{itemize}
+\vspace{10mm}
+ $5^\circ = 0.087266$ rad
+\end{frame}
+
+\begin{frame}{Obmedzenie prírastku vstupu v MPC}
+
+Ak sa optimalizuje sekvencia vstupov, obmedzenie ich prírastku má podobu:
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+Kladnı prírastok:
+\begin{eqnarray*}
+u_1 & \leq & u_0 + du\\
+u_2 & \leq & u_1 + du\\
+u_3 & \leq & u_2 + du
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+Zápornı prírastok:
+\begin{eqnarray*}
+u_1 & \geq & u_0 - du\\
+u_2 & \geq & u_1 - du\\
+u_3 & \geq & u_2 - du
+\end{eqnarray*}
+\end{column}
+\end{columns}
+\vspace{5mm}
+Prepísané:
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+u_1 & \leq & u_0 + du\\
+u_2 - u_1& \leq &  du\\
+u_3 - u_2& \leq &  du
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+-u_1 & \leq & -u_0 + du\\
+-u_2 + u_1& \leq &  du\\
+-u_3 + u_2& \leq &  du
+\end{eqnarray*}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Obmedzenie prírastku vstupu v MPC}
+Tieto obmedzenia v maticovej forme.\\
+\vspace{3mm}
+Kladné:
+\begin{eqnarray*}
+\left[
+\begin{array}{rrr}
+1 & 0 & 0 \\
+-1 & 1 & 0 \\
+0 & -1 & 1
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+u_1\\
+u_2\\
+u_3
+\end{array}
+\right]
+\leq
+\left[
+\begin{array}{c}
+u_0 + du\\
+du\\
+du
+\end{array}
+\right]
+\end{eqnarray*}
+Záporné:
+\begin{eqnarray*}
+\left[
+\begin{array}{rrr}
+-1 & 0 & 0 \\
+1 & -1 & 0 \\
+0 & 1 & -1
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+u_1\\
+u_2\\
+u_3
+\end{array}
+\right]
+\leq
+\left[
+\begin{array}{c}
+du - u_0\\
+du\\
+du
+\end{array}
+\right]
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Parametre systému}
+
+\begin{eqnarray*}
+m_1 &=& 2 \text{ [kg]}\\
+m_2 &=& 1 \text{ [kg]}\\
+l &=& 4 \text{ [m]}\\
+g &=& 9.81 \text{ [ms$^{-1}$]}\\
+Ts &=& 0.1 \text{ [s]}\\
+x_{1 ziadana} &=& [10, 0, 0, 0]^T
+\end{eqnarray*}
+
+
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{itemize}
+\item vytvorte lineárne regulátory pre polohovadlo\\
+ \hspace{3mm} -saturovanı LQ \\
+ \hspace{3mm} -MPC s obmedzeniami \\
+\item oba regulátory aplikujte na nelineárnu simuláciu dynamiky polohovadla
+\item regulátory nalaïte tak aby systém dosiahol iadanı stav $x_{1ziadana}$ za zhruba 10s
+\item vyšetrite chovanie MPC regulátora pre rôzne dåky predikèného horizontu
+\item v závere slovne zhodnote vıkon oboch regulátorov, ich klady a zápory a napíšte aj vaše postrehy
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bonusové úlohy}
+\begin{itemize}
+\item animácia polohovadla, +1 bod
+\item integrovanie Kálmánovho filtra do regulátora, prièom meraná je iba poloha vozíka $x_1$ a šum jej merania sa pohybuje v realistickıch medziach, +2 body
+\end{itemize}
+\end{frame}
+
+\end{document}

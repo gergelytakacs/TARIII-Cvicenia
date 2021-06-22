@@ -1,0 +1,267 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie VI, Kriteriálna funkcia}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista, E.Mikuláš}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[2.11.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Na dnešnom cvièení}
+Zostavenie kriteriálnych matíc potrebnıch k optimalizácií\\[2ex]
+\begin{itemize}
+\item Hessian $\textbf{H}$
+\item $\textbf{G}, \textbf{F}, \textbf{P}_f$\\[2ex]
+\end{itemize}
+pre ¾ubovo¾nı diskrétny lineárny stavovı systém a váhovacie matice.\\[2ex]
+Ïalej sa porovná MPC bez obmedzení s LQ
+\end{frame}
+
+\begin{frame}{Z prednášky}
+
+Aká bude optimálna sekvencia budúcich vstupov?\\[2ex]
+\begin{eqnarray*}
+\overrightarrow{\vec{u}}^{\ast}_k=arg\min_{\overrightarrow{\vec{u}}_k} J(\vec{x}_k,\overrightarrow{\vec{u}}_k)
+\end{eqnarray*}
+
+Kriteriálna funkcia vo forme:\\[2ex]
+
+\begin{equation*}
+J_k=\sum^{n_p-1}_{i=0}(\vec{x}^T_{k+i}\vec{Q}\vec{x}_{k+i}+\vec{u}^T_{k+i}\vec{R}\vec{u}_{k+i})+\vec{x}^T_{k+n_p}\vec{P}_f\vec{x}_{k+n_p}
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Z prednášky}
+Predickia stavov:\\[2ex]
+\begin{eqnarray*}
+\label{xvecpred}
+\vec{x}_{k+i}&=&\vec{M}_i\vec{x}_k+\vec{N}_i\vec{u}_k\\
+\end{eqnarray*}
+$\vec{x}_{k+i}$ dosadíme do $J_k$ a dostaneme:\\[2ex]
+
+\begin{equation*}
+J_k=\vec{u}^T_k\vec{H}\vec{u}_k+2\vec{x}^T_k\vec{G}^T\vec{u}_k+\vec{x}^T_k\vec{F}\vec{x}_k
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Z prednášky}
+Teda h¾adáme minimum v tvare (èlen $\vec{x}^T_k\vec{F}\vec{x}_k$ nám nemení polohu minima tak ho môeme vynecha):
+\begin{equation*}
+{\vec{u}}^{\ast}_k=arg\min_{{\vec{u}}_k} J(\vec{u}^T_k\vec{H}\vec{u}_k+2\vec{x}^T_k\vec{G}^T\vec{u}_k)
+\end{equation*}
+po derivácií kriteriálnej funkcie dostaneme:
+\begin{equation*}
+\triangledown J_k=2\vec{H}\vec{u}_k+2\vec{G}\vec{x}_k
+\end{equation*}
+a $J_k=0$ potom:
+\begin{equation*}
+\vec{u}^\star_k=-\vec{H}^{-1}\vec{G}\vec{x}_k
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Èo k tomu potrebujeme}
+\begin{itemize}
+\item LQ zosilnenie $\vec{K}$ pomocou \textbf{"dlqr"}
+\item penalizácia koneèného stavu $\vec{P}_f$ pomocou \textbf{"dlyap"} kde, 
+\end{itemize}
+\small
+\begin{eqnarray*}
+\label{lyapmatlab}
+\vec{A}_m\vec{X}_m\vec{A}^T_m-\vec{X}_m+\vec{Q}_m&=& 0,\\
+\vec{X}_m&=&\vec{P},\\
+\vec{A}_m&=&(\vec{A}+\vec{B}\vec{K})^T,\\
+\vec{Q}_m&=&\vec{Q}+\vec{K}^T\vec{R}\vec{K},
+\end{eqnarray*}
+\normalsize
+\begin{itemize}
+\item zosilnenie MPC bez obmedzení $\mathscr{K}$ ktoré:
+\end{itemize}
+
+\begin{eqnarray*}\vec{u}_k=-\mathscr{K}\vec{x}_k =-\begin{bmatrix}
+\vec{I}_{n_u} & \vec{0} & \vec{0} & ... & \vec{0}
+\end{bmatrix}\vec{H}^{-1}\vec{G}\vec{x}_k
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}{Èo k tomu potrebujeme}
+Po dosadení predikcie do úèelovej funkcie
+\begin{eqnarray*}
+\vec{H}&=&\sum_{i=0}^{n_p-1}(\vec{N}^T_i\vec{Q}\vec{N}_i)+\vec{N}^T_{n_p}\vec{P}_f\vec{N}_{n_p}+\mathscr{R}\\
+\vec{G}&=&\sum_{i=0}^{n_p-1}(\vec{N}^T_i\vec{Q}\vec{M}_i)+\vec{N}^T_{n_p}\vec{P}_f\vec{M}_{n_p}\\
+\vec{F}&=&\sum_{i=0}^{n_p-1}(\vec{M}^T_i\vec{Q}\vec{M}_i)+\vec{M}^T_{n_p}\vec{P}_f\vec{M}_{n_p}\\
+\mathscr{R}&=&\begin{bmatrix}
+\vec{R} & 0 & ... & 0\\
+0 & \vec{R} & ... & 0\\
+\colon & \colon & \ddots & \colon\\
+0 & 0 & ... & \vec{R}
+\end{bmatrix}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{itemize}
+\item napíšte algoritmus na vytvorenie matíc $\vec{H},\vec{G},\vec{F},\vec{P}_f$
+\item váš algoritmus musí by univerzálne pouite¾nı
+\item vypoèítajte zosilnenie $\mathscr{K}$ MPC bez obmedzení pre váš nosník a simulaène porovnajte priebeh regulácie s nesaturovanım LQ
+\item overte funkènos algoritmu pre stavové systémy inej ve¾kosti
+\item vypíšte vısledok kontrolného príkladu
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pomôcka}
+\begin{itemize}
+\item rozmer matice $\mathscr{R}$ je $(n_p \times n_u) \times (n_p \times n_u)$
+\item rozmer matice $\vec{H}$ je $(n_p \times n_u) \times (n_p \times n_u)$
+\item rozmer matice $\vec{G}$ je $(n_p \times n_u) \times (n_x)$
+\item rozmer matice $\vec{F}$ je $(n_x) \times (n_x)$\\[2ex]
+\end{itemize}
+Vstupné parametre kontrolného príkladu:
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+A &=& \begin{bmatrix}
+1.1 & 2\\
+0 & 0.95\\
+\end{bmatrix}\\
+B &=& \begin{bmatrix}
+0\\
+0.0787\\
+\end{bmatrix}\\
+C &=& \begin{bmatrix} -1 & 1 \end{bmatrix}\\
+\end{eqnarray*}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+Q &=& C^TC\\
+R &=& 0.01\\
+n_p &=& 4\\
+\end{eqnarray*}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Pomôcka}
+Vıstup:
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{eqnarray*}
+\vec{P}_f &=& \begin{bmatrix}
+3.915 & 4.826\\
+4.826 & 13.856\\
+\end{bmatrix}\\
+\vec{H} &=& \begin{bmatrix}
+1.440 & 0.984 & 0.587 & 0.262\\
+0.984 & 0.721 & 0.436 & 0.200\\
+0.587 & 0.436 & 0.304 & 0.141\\
+0.262 & 0.200 & 0.141 & 0.095\\
+\end{bmatrix}\\
+\end{eqnarray*}
+\end{column}
+\begin{column}{0.30\textwidth}
+\begin{eqnarray*}
+\vec{F} &=& \begin{bmatrix}
+13.839 & 66.693\\
+66.693 & 413.120\\
+\end{bmatrix}\\
+\vec{G} &=& \begin{bmatrix}
+3.674 & 23.944\\
+2.366 & 16.181 \\
+1.325 & 9.496\\
+0.556 & 4.178\\
+\end{bmatrix}\\
+\end{eqnarray*}
+\end{column}
+\end{columns}
+\end{frame}
+
+\end{document}

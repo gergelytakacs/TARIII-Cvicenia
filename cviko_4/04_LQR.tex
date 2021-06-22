@@ -1,0 +1,127 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie IV, LQ riadenie}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista E. Mikul\'{a}\v{s}}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[12.10.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Úloha}
+Použitím identifikovaného modelu diskrétneho modelu z predošlého cvièenia:
+\begin{itemize}
+\item Vytvorte LQ regulátor
+\item Overte jeho stabilitu
+\item Urobte diskrétnu simuláciu otvorenej sluèky a uzatvorenej s LQ riadením
+\item Urobte diskrétnu simuláciu LQ riadenia so saturáciou
+\item Porovnajte odozvy v èasovej a frekvenènej oblasti
+\end{itemize}
+\end{frame}
+
+\begin{frame}{LQ regulátor}
+\vspace{1cm}
+Pozri:
+\begin{itemize}
+\item TARII - Week 10 - LQ Control.pdf
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Do zadania}
+\begin{itemize}
+\item MATLAB kód vášho zadania s komentárom
+\item zobrazenie koreòov otvorenej a uzatvorenej sluèky
+\item porovnanie troch èasových odoziev na impulz $ x_{0} = \begin{bmatrix} 0.01\\ 0 \end{bmatrix}$ \\ \small (vo¾né kmitanie, LQ riadenie, LQ riadenie so saturáciou vstupu $\pm$ 90 V)
+\item \normalsize porovnanie frekvenèných charakteristík troch odoziev (\textbf{"periodogram"})
+\item porovnanie èasového priebehu vstupov regulátorov
+\item grafy vykreslite tak aby boli všetky rozdiely jasne vidite¾né a farebne odlíšené
+\end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,9 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\astroncite{Ferreau et~al.}{2014}]{Ferreau2014}
+Ferreau, H., Kirches, C., Potschka, A., Bock, H., and Diehl, M. (2014).
+\newblock {qpOASES}: A parametric active-set algorithm for quadratic
+  programming.
+\newblock {\em Mathematical Programming Computation}, 6(4):327--363.
+
+\end{thebibliography}

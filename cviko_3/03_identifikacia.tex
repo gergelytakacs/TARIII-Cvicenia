@@ -1,0 +1,204 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie III, Experimentálna identifikácia sústav}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista, E. Mikuláš}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[5.10.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Èo je identifikácia}
+Experimentálna identifikácia sústav slúi na odmeranie parametrov sústavy pomocou experimentu.\\[2ex]
+Pozostáva:
+\begin{itemize}
+\item experiment (namerá sa odozva systému na vopred známy vstup)
+\item prispôsobenie matematického modelu dátam pomocou:\\
+\begin{itemize}
+\item Grey-box modelovanie (vopred známy matematickı model, odhadujú sa len jeho parametre)
+\item Black-box modelovanie (vopred neznámy model, vyberie nejakı a na ten sa odhadujú parametre)
+\end{itemize}
+\item overenie modelu (urobí sa simulácia modelu s vopred danım vstupom a porovná sa s dátami nameranımi poèas experimentu)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Naša úloha}
+\vspace{2mm} \small
+Zisti parametre nášho nosníka\\[2ex]
+Spôsob získania dát:\\
+V matlabe sa vygeneroval pseudo-náhodnı binárny signál (jednotky a nuly) ktorı sa následne premenil na vstup do nášho akèného èlena (-30V a 30V). Tento vstup sa následne nahral do xPC Target a zmerala sa odozva systému. 
+
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = \textwidth]{odozvy_kom.eps}
+\caption{Odozva systému}
+\end{figure}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\vspace{3mm}
+\begin{figure}
+\centering
+\includegraphics[width = \textwidth]{input.eps}
+\caption{Vstup do systému}
+\end{figure}
+\end{column}
+
+\end{columns}
+
+
+
+\end{frame}
+
+\begin{frame}{Náš model}
+
+Dynamika:
+\begin{eqnarray*}
+\begin{bmatrix} \dot{x}_{1}(t)\\\dot{x}_{2}(t)\end{bmatrix} &=& \begin{bmatrix} 0 & 1 \\ -\frac{k}{m} & -\frac{b}{m} \end{bmatrix} \begin{bmatrix} x_{1}(t)\\x_{2}(t)\end{bmatrix} + \begin{bmatrix} 0\\B2*m\end{bmatrix} U_{in}(t)
+\end{eqnarray*}
+Pozorovate¾:
+\begin{eqnarray*}
+{y}(t) &=& \begin{bmatrix} 1 & 0 \end{bmatrix} \begin{bmatrix} x_{1}(t)\\x_{2}(t)\end{bmatrix}
+\end{eqnarray*}
+
+Známe parametre: $m$\\
+Neznáme parametre: $k, b, B2$
+\end{frame}
+
+\begin{frame}{Metodológia}
+
+Postup pri našej experimentálnej identifikácií (Grey-box):\\
+\begin{itemize}
+\item Preprocesing dát (spracovanie do uitoènej formy, v našom prípade poui funkciu "\textbf{detrend}" na vıstupné dáta a vynásobi ich 0.001 aby sme vıstup dostali v metroch)
+\item Vytvorenie správneho dátového objektu pomocou "\textbf{iddata}" kde $ Ts = 0.01 [s] $
+\item Vytvorenie správnej modelovej štruktúry pomocou príkazu "\textbf{idss}"
+\item Identifikácia systému(spojitého) pomocou "\textbf{pem}"
+\item Diskretizácia modelu pomocou "\textbf{c2d}"
+\item Porovnanie èasovej odozvy a frekvenènej charakteristiky simulovaného modelu a nameranıch dát
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Porovnanie frekvenènıch charakteristík}
+\vspace{1cm}
+\begin{figure}
+\centering
+\includegraphics[width = \textwidth]{periodo.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Poznámky k identifikácií modelu}
+Pre dosiahnutie úspešnej identifikácie je treba:
+\begin{itemize}
+\item definova známe parametre, $ m = 0.4086 [kg] $
+\item vhodne definova vıchodiskové hodnoty neznámych parametrov modelu (tak aby sa blíili reálnej hodnote) v našom prípade $ k = 400 [N/m], b = 0.01 [Ns/m], B2 = 0.001 $
+\item definova poèiatoènı odhad stavového modelu: $ \textbf{A,B,C,D,x0} $
+\item vytori spojitı identifikaènı stavovı model pomocou "\textbf{idss}"
+\item definova známu štruktúru modelu pomocou subparametrov $ \textbf{As,Bs,Cs,x0s} $ v ktorıch sa neznáme políèko matice oznaèí ako "\textbf{NaN}". Ïalej sa zvolí perióda vzorkovania $ Ts = 0 $ aby sa model bral ako spojitı
+\item zvoli vhodnú èas dát z poskytnutého balíku (ak "\textbf{pem}" nekonverguje treba skúsit inú èas) 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Do zadania}
+\begin{itemize}
+\item naèíta experimentálne dáta "\textbf{03\_data.mat}"
+\item poèiatoènı odhad modelu $ \textbf{A,B,C,D,x0} $
+\item štruktúrovanı model $ \textbf{As,Bs,Cs,x0s} $
+\item identifikovanı model $ \textbf{A,B} $
+\item grafické porovnanie odoziev spojitého a diskrétneho identifikovaného modelu (pomocou "\textbf{sim}") a nameranej odozvy
+\item grafické porovnanie frekvenènıch charakteristík tıchto troch odoziev pomocou "\textbf{periodogram}"
+\item vıpoèet fyzikálnych parametrov $ m,b,k,B2 $ a vlastnej uhlovej frekvencie z elementov matíc $ \textbf{A,B} $
+\item do zadania vlote kód, obrázky a krátky popis toho èo ste robili
+\end{itemize}
+\end{frame}
+
+\end{document}

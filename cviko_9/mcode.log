@@ -1,0 +1,14 @@
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdftex 2015.11.16)  16 NOV 2015 13:02
+entering extended mode
+**C:/Users/Batee/Desktop/Doktorantske*studium/TARIII/slides/cviko_9/mcode.sty
+("C:/Users/Batee/Desktop/Doktorantske studium/TARIII/slides/cviko_9/mcode.sty"
+! Undefined control sequence.
+l.106 \typeout
+              {-- Package: `mcode' \fileversion\space <\filedate> --}
+? 
+! Emergency stop.
+l.106 \typeout
+              {-- Package: `mcode' \fileversion\space <\filedate> --}
+End of file on the terminal!
+
+!  ==> Fatal error occurred, no output PDF file produced!

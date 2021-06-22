@@ -1,0 +1,300 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie V, Predikcia}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista, E.Mikuláš}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[26.10.2015] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Na dnešnom cvièení}
+Zostavenie predikènıch matíc \\[2ex]
+\begin{itemize}
+\item vo¾nej odozvy $\vec{M}$
+\item vynútenej odozvy $\vec{N}$\\[2ex]
+\end{itemize}
+pre ¾ubovo¾nı diskrétny lineárny stavovı systém
+\end{frame}
+
+\begin{frame}{Z prednášky}
+Keïe 
+\begin{eqnarray*}
+\label{pred}
+\begin{array}{lll}
+k\qquad &\vec{x}_k &=\vec{x}_k\\
+k+1\qquad &\vec{x}_{k+1} &=\vec{A}\vec{x}_{k}+\vec{B}\vec{u}_{k}\\
+k+2\qquad & \vec{x}_{k+2} &=\vec{A}\vec{x}_{k+1}+\vec{B}\vec{u}_{k+1}=\vec{A}^2\vec{x}_{k}+\vec{A}\vec{B}\vec{u}_{k}+\vec{B}\vec{u}_{k+1}\\
+\vdots & \vdots &\\
+k+n_p\qquad &\vec{x}_{k+n_p} &=\vec{A}\vec{x}_{k+n_p-1}+\vec{B}\vec{u}_{k+n_p-1}\\
+& &=\vec{A}^{n_p}\vec{x}_{k}+\vec{A}^{n_p-1}\vec{B}\vec{u}_{k}+\ldots+\vec{A}\vec{B}\vec{u}_{k+n_p}+\vec{B}\vec{u}_{k+n_p-1}\\
+\end{array}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Z prednášky}
+a
+\begin{eqnarray*}
+\label{umatrix}
+\overrightarrow{\vec{x}}_k=\left[ \begin{array}{l}
+\vec{x}_{k}\\
+\vec{x}_{k+1}\\
+\vec{x}_{k+2}\\
+\vdots\\
+\vec{x}_{k+n_p-2}\\
+\vec{x}_{k+n_p-1}\\
+\vec{x}_{k+n_p}\\
+\end{array}\right] \qquad
+\overrightarrow{\vec{y}}_k=\left[ \begin{array}{l}
+\vec{y}_{k}\\
+\vec{y}_{k+1}\\
+\vec{y}_{k+2}\\
+\vdots\\
+\vec{y}_{k+n_p-2}\\
+\vec{y}_{k+n_p-1}\\
+\vec{y}_{k+n_p}\\
+\end{array}\right]\qquad
+\overrightarrow{\vec{u}}_k=\left[ \begin{array}{l}
+\vec{u}_{k}\\
+\vec{u}_{k+1}\\
+\vec{u}_{k+2}\\
+\vdots\\
+\vec{u}_{k+n_p-3}\\
+\vec{u}_{k+n_p-2}\\
+\vec{u}_{k+n_p-1}\\
+\end{array}\right]
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Z prednášky}
+teda,
+\begin{eqnarray*}
+\label{xvecpred}
+\overrightarrow{\vec{x}}_{k}&=&\vec{M}\vec{x}_k+\vec{N}\overrightarrow{\vec{u}}_k\\
+\vec{x}_{k+i}&=&\vec{M}_{i}\vec{x}_k+\vec{N}_i \vec{u}_k=\vec{A}^{i}\vec{x}_k+\vec{N}_i \vec{u}_k
+\end{eqnarray*}
+teda pre riadky:
+\begin{eqnarray*}
+\vec{M}_i&=&\vec{A}^i\\
+{\vec{N}_i}&=&\left[ \begin{array}{ccccccc}
+\vec{A}^{i}\vec{B} & \vec{A}^{i-1}\vec{B} & \vec{A}^{i-2}\vec{B} & \ldots & \vec{A}^2\vec{B} & \vec{AB} & \vec{B}\\
+\end{array}\right]
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Z prednášky}
+
+\begin{eqnarray*}
+\vec{M}=\left[ \begin{array}{l}
+\vec{A}^1\\
+\vec{A}^2\\
+\vdots\\
+\vec{A}^{n_p-2}\\
+\vec{A}^{n_p-1}\\
+\vec{A}^{n_p}\\
+\end{array}\right]
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Z prednášky}
+\begin{eqnarray*}
+\label{N}
+\vec{N}=\left[ \begin{array}{ccccccc}
+\vec{B} & \vec{0} & \vec{0} & \ldots & \vec{0} & \vec{0} & \vec{0}\\
+\vec{AB} & \vec{B} & \vec{0} & \ldots & \vec{0} & \vec{0} & \vec{0}\\
+\vec{A}^2\vec{B} & \vec{AB} & \vec{B} & \ldots & \vec{0} & \vec{0} & \vec{0}\\
+\vdots & \vdots & \vdots & \ddots & \vdots &  \vdots & \vdots \\
+\vec{A}^{n_p-3}\vec{B} & \vec{A}^{n_p-4}\vec{B} & \vec{A}^{n_p-5}\vec{B} & \ldots & \vec{B} & \vec{0} & \vec{0}\\
+\vec{A}^{n_p-2}\vec{B} & \vec{A}^{n_p-3}\vec{B} & \vec{A}^{n_p-4}\vec{B} & \ldots & \vec{AB} & \vec{B} & \vec{0}\\
+\vec{A}^{n_p-1}\vec{B} & \vec{A}^{n_p-2}\vec{B} & \vec{A}^{n_p-3}\vec{B} & \ldots & \vec{A}^2\vec{B} & \vec{AB} & \vec{B}\\
+\end{array}\right]
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}{Èo k tomu potrebujeme}
+Príkazy MATLAB
+\begin{itemize}
+\item \textbf{zeros(m,n)} -> zostavenie nulovej matice ve¾kosti $m \times n$
+\item \textbf{eye(n)} -> zostavenie jednotkovej diagonálnej matice ve¾kosti $n \times n$
+\item \textbf{ones(m,n)} -> zostavenie jednotkovej matice ve¾kosti $m \times n$
+\item \textbf{size(M)} -> zistenie poètu riadkov a ståpcov matice $\vec{M}$
+\item \textbf{M(a:b,c:d)} -> indexovanie matice(vyberanie èasti matice) od riadku $a$ do riadku $b$ a od ståpca c do ståpca $d$
+\end{itemize}
+Príklad:
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+A=\begin{bmatrix}
+1 & 2 & 3 & 4 & 5\\
+6 & 7 & 8 & 9 & 10\\
+10 & 11 & 12 & 13 & 14\\
+15 & 16 & 17 & 18& 19\\
+20 & 21 & 22 & 23 & 24
+\end{bmatrix}
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\vspace{5mm}
+\begin{eqnarray*}
+A(2:4,2:3)=\begin{bmatrix}
+7 & 8\\
+11 & 12\\
+16 & 17\\
+\end{bmatrix}
+\end{eqnarray*}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Zadanie}
+\begin{itemize}
+
+\item algoritmus na zostavenie matice predikcie vo¾nej odozvy $\vec{M}$
+\item algoritmus na zostavenie matice predikcie vynútenej odozvy $\vec{N}$
+\item váš algoritmus zostavte tak aby bol univerzálny, t.j. aby sa dal poui na systém ¾ubovo¾nej ve¾kosti
+\item naèítajte váš identifikovanı model nosníka a zostavte matice $\vec{M}$ a $\vec{N}$ pri poète krokov $n_p = 5$
+\item vygenerujte sekvenciu náhodnıch vstupov $u$ (poèet = $n_p$) pomocou funkcie \textbf{"random"}
+\item urobte rekurentnú simuláciu vášho systému pomocou vopred vygenerovanıch vstupov $u$ (poèet krokov = $n_p$)
+\item koneènı stav systému porovnajte s vıpoètom pomocou predikènıch matíc $\vec{M}$ a $\vec{N}$ (èíselne)
+\item overte funkènos algoritmu pomocou stavového systému väèšieho ako $2\times2$, vytvorte ho príkazom \textbf{"drss"}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pomôcka}
+\begin{itemize}
+\item rozmer matice $\vec{M}$ je $(n_x \times n_p)\times(n_x)$
+\item rozmer matice $\vec{N}$ je $(n_x \times n_p)\times(n_u \times n_p)$\\[2ex]
+\end{itemize}
+Kontrolnı príklad
+\begin{columns}
+\begin{column}{0.35\textwidth}
+
+\begin{eqnarray*}
+A &=& \begin{bmatrix}
+1.1 & 2\\
+0 & 0.95\\
+\end{bmatrix}\\[2ex]
+B &=& \begin{bmatrix}
+0\\
+0.0787\\
+\end{bmatrix}\\[2ex]
+n_p &=& 3
+\end{eqnarray*}
+
+\end{column}
+
+\begin{column}{0.60\textwidth}
+\begin{eqnarray*}
+M &=& \begin{bmatrix}
+1.1 & 2\\
+0 & 0.95\\
+1.21 & 4.1\\
+0 & 0.9025\\
+1.331 & 6.315\\
+0 & 0.8574\\ 
+\end{bmatrix}\\
+N &=& \begin{bmatrix}
+0 & 0 & 0\\
+0.0787 & 0 & 0\\
+0.1574 & 0 & 0\\
+0.0748 & 0.0787 & 0\\
+0.3227 & 0.1574 & 0\\
+0.0710 & 0.0748 & 0.0787\\
+\end{bmatrix}
+\end{eqnarray*}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\end{document}

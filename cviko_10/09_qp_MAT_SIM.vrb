@@ -1,0 +1,6 @@
+V poslednom kroku je nutnÈ zavolaù funkciu vo forme
+\begin{lstlisting}
+qpOASES_sequence( 'c',QP )
+
+\end{lstlisting}
+nato aby sa zmazal objekt \mcode{QP} a uvolnila sa alokovan· pam‰ù.

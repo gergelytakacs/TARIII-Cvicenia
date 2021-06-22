@@ -1,0 +1,412 @@
+% cvicenie 1
+
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\usetheme{Singapore}
+  %\usetheme{Szeged}
+  \usetheme{Boadilla}
+
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+%\input newcomm
+%\usepackage{slovak}
+\usepackage{times}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{theorem}
+\usepackage{subfigure}
+\usepackage{epsfig}
+%\usepackage{natbib}
+\usepackage{mathrsfs} %mathscr
+\usepackage[cp1250]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[slovak]{babel}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{epstopdf}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %I want bold vectors instead of arrows
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\title[TAR III.] % (optional, use only with long paper titles)
+{Teória automatického riadenia III.}
+\subtitle{Cvièenie I, Úvod}
+
+\author[] % (optional, use only with lots of authors)
+{G. Takács, G. Batista, E. Mikuláš}
+
+
+\institute[UAMAI] % (optional, but mostly needed)
+{
+  Ústav automatizácie, merania a aplikovanej informatiky\\
+  Strojnícka fakulta, Slovenská technická univerzita}
+%  \and
+%  \inst{2}%
+%  Department of Theoretical Philosophy\\
+%  University of Elsewhere}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[18.09.2017] % (optional, should be abbreviation of conference name)
+{}
+% - Either use conference name or its abbreviation.
+% - Not really informative to the audience, more for people (including
+%   yourself) who are reading the slides online
+
+\subject{Automatizácia a riadenie}
+% This is only inserted into the PDF information catalog. Can be left
+% out.
+
+%\begin{center}
+%\includegraphics[height=2cm]{logo_stu_sjf_clr.eps} \\
+%\end{center}
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1.5cm]{logo}{logo}
+\logo{\pgfuseimage{logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Obsah}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Základné informácie}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+Prednášajúci:\\[6ex]
+Cvièiaci:\\[5ex]
+Kontakty:\\
+\end{column}
+
+\begin{column}{0.48\textwidth}
+doc. Ing. Gergely Takács PhD.\\
+(Mýtna ul. 36, è. d. 316)\\
+Konzultácie: Pondelok 10:00\\[2ex]
+Ing. Erik Mikulá¹\\
+(Mýtna ul. 36, è. d. 319)\\[2ex]
+gergely.takacs@stuba.sk\\
+erik.mikulas@stuba.sk\\
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Odporúèaná literatúra}
+\begin{itemize}
+\item G. Takács and B. Roha¾-I¾kiv. Model Predictive Vibration Control. London : Springer Verlag London, 2012. - 512 s. -ISBN 978-1-4471-2332-3
+\item M. Cannon. C4A Model Predictive Control. University of Oxford, 2005
+\item Modern Control Engineering, 5th edition, K. Ogata, Pearson 2010
+\item J. Maciejowski. Predictive control: with constraints. Prentice Hall, 2002
+\item Rossiter. Model-based predictive control: a practical approach. CRC Press, 2003
+\item Mathworks Inc., The Matlab Help. 1984-2013
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Zadania a vedlaj¹ie písomné previerky}
+\begin{itemize}
+\item Cvièenia budú obsahova» zadania a vedlaj¹ie písomné previerky, ktoré sú vy¾adované a hodnotené
+\item V¹etky zadania, t.j. 10 zadaní, majú spolu hodnotu 20 bodov
+\item V¹etky vedlaj¹ie písomné previerky, t.j. 6 previerok, majú spolu hodnotu 12 bodov
+\item Odovzdanie zadania je v¾dy do zaèiatku nasledujúceho cvièenia
+\item Zadanie odovzdané po tomto termíne bude penalizované odpoèítaním 1 bodov za každý omeškaný tý¾deò
+\item Zadanie sa odovzdáva na samostatnom papieri. Zadanie je mo¾né odovzda» aj v elektronickej podobe (pdf)
+\item Na základe týchto vedlaj¹ích hodnotení sa bude skú¹ajúci predmetu rozhodova» v prípade nejednoznaèného výsledku skú¹ky
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Podmienky na absolvovanie predmetu}
+\begin{itemize}
+\item Podmienkou absolvovania predmetu je 100\% úèas» na cvièeniach (max. 2 ospravedlnenia od lekára)
+\item Hodnotenie je zalo¾ené na kombinácii písomných previerok a skú¹ky
+\item V priebehu semestra budú tri hlavné písomné previerky po 20 bodoch
+\item Termín písomných previerok je cca. v 4., 8. a zápoètovom tý¾dni semestra
+\item Predmet konèí skú¹kou, ktorá pozostáva z písomnej a ústnej skú¹ky s celkovým poètom bodov 30
+\item Výsledné hodnotenie predmetu je 0,5 krát súèet bodov z písomných previerok + poèet bodov zo skú¹ky
+\item Kredity nebudú udelené ¹tudentovi, ktorého súèet bodov z písomných previerok poèas semestra je men¹í ako 25
+\item Mimoriadna aktivita ¹tudenta mô¾e by» vzatá do úvahy pri jeho bodovom hodnotení, t.j. na ka¾dom cvièení mô¾e získa» max. 1 bod za aktivitu a iniciatívu
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Akademická èestnos»}
+\begin{itemize}
+\item Akademická èestnos» je podmienkou cvièení
+\item V¹etky domáce úlohy a zadania musia by» va¹ou vlastnou nezávislou prácou
+\item Ak sa vyskytnú dve alebo viac rovnakých domácich úloh, cvièiaci bude akceptova» iba prvú v poradí
+\item Cvièiaci urèí pod¾a vlastného úsudku ktoré práce sú rovnaké
+\item Èo je plagiátorstvo? Plagiátorstvo je prezentovanie práce, ktorá nie je va¹a
+\item Mô¾ete a ste podporovaní k diskutovaniu  o stratégii rie¹enia úloh, ale va¹a práca musí by» va¹a vlastná
+\item Kopírovanie a umo¾nenie kopírovania je neakceptovate¾né!
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Úvod - ¾ahko tlmené sústavy}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 6cm]{uh-60.png}
+\caption{Krídla a rotory}
+\includegraphics[width = 4cm]{canadarm.png}
+\caption{Manipulátory, ramená...}
+\end{figure}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 3.5cm]{satelit.png}
+\caption{Solárne panely satelitov}
+\includegraphics[width = 3.5cm]{antena.png}
+\caption{Vysielaèe, stožiare...}
+\end{figure}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Úvod - aktívne tlmenie kmitania}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 3.5cm]{boeing.png}
+\caption{Boeing SMART rotor}
+\includegraphics[width = 3.5cm]{f18.png}
+\caption{NASA F18 aktívne "aeroelastické" krídlo}
+\end{figure}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 4cm]{sikorsky.png}
+\caption{Prototyp Sikorsky X2 s aktívnym tlmením kmitania}
+\end{figure}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Úvod - aktívne tlmenie kmitania}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 4cm]{smart_rot.png}
+\caption{SMART rotor}
+\end{figure}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 5cm]{lab_1.png}
+\caption{Na¹e laboratórne zariadenie}
+\end{figure}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Laboratórium}
+\begin{figure}
+\centering
+\includegraphics[width = 12cm]{HW.png}
+\caption{Schéma laboratórneho zariadenia}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vo¾né vs. riadené kmitanie}
+\begin{figure}
+\centering
+\includegraphics[width = 12cm]{resp_1.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vo¾né vs. riadené kmitanie}
+\begin{figure}
+\centering
+\includegraphics[width = 12cm]{resp_2.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vo¾né vs. riadené kmitanie}
+\begin{figure}
+\centering
+\includegraphics[width = 12cm]{fft.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Zaujímavé videá}
+\begin{itemize}
+\item \href{https://www.youtube.com/watch?v=nFzu6CNtqec}{Most Tacoma Narrows}
+\item \href{https://www.youtube.com/watch?v=8-S3xAWhZM0}{FEM simulácia}
+\item \href{https://www.youtube.com/watch?v=6vICf8l-KV0}{Rezonanicia vrtulníka, MacGyver}
+\item \href{https://www.youtube.com/watch?v=RihcJR0zvfM}{Rezonancia CH-47 Chinook}
+\item \href{https://www.youtube.com/watch?v=4NEGiblNFO4}{Rezonancia Eurocopter}
+\end{itemize}
+\end{frame}
+%
+%\begin{frame}{Používané príkazy v Matlabe}
+%content...
+%\end{frame}
+
+\begin{frame}{Stavový model kmitajúcej sústavy}
+\begin{itemize}
+\item Aký je model dynamiky?
+\end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width = 7cm]{1DOF.eps}
+\end{figure}
+
+\begin{itemize}
+\item m = 0.1782 [kg]
+\item k = 470 [N/m]
+\item b = 0.08344 [Ns/m]
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Stavový model kmitajúcej sústavy}
+\begin{itemize}
+\item Aký je model dynamiky?
+\end{itemize}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+m\ddot{q}(t)+b\dot{q}(t)+kq(t)=f_{e}(t)\\[2ex]
+m\ddot{q}(t)=-b\dot{q}(t)-kq(t)+f_{e}(t)\\[2ex]
+\ddot{q}(t)=-\frac{b}{m}\dot{q}(t)-\frac{k}{m}q(t)+\frac{1}{m}f_{e}(t)
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.3\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 4cm]{1DOF.eps}
+\end{figure}
+\begin{itemize}
+\item m = 0.1782 [kg]
+\item k = 470 [N/m]
+\item b = 0.08344 [Ns/m]
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Stavový model kmitajúcej sústavy}
+\begin{itemize}
+\item Aký je model dynamiky?
+\end{itemize}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{eqnarray*}
+\vec{x}(t)  &=&  \begin{bmatrix} x_{1}(t) \\ x_{2}(t) \end{bmatrix}= \begin{bmatrix} q(t) \\ \dot{q}(t) \end{bmatrix}\\[2ex]
+\dot{x}_{1}(t) &=& x_{2}(t)\\[2ex]
+\dot{x}_{2}(t) &=& -\frac{b}{m}x_{2}(t) - \frac{k}{m}x_{1}(t)  -\frac{1}{m}f_{e}(t)
+\end{eqnarray*}
+\end{column}
+
+\begin{column}{0.3\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 4cm]{1DOF.eps}
+\end{figure}
+\begin{itemize}
+\item m = 0.1782 [kg]
+\item k = 470 [N/m]
+\item b = 0.08344 [Ns/m]
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Stavový model kmitajúcej sústavy}
+\begin{eqnarray*}
+\begin{bmatrix} \dot{x}_{1}(t)\\\dot{x}_{2}(t)\end{bmatrix} &=& \begin{bmatrix} 0 & 1 \\ -\frac{k}{m} & -\frac{b}{m} \end{bmatrix} \begin{bmatrix} x_{1}(t)\\x_{2}(t)\end{bmatrix} + \begin{bmatrix} 0\\\frac{1}{m}\end{bmatrix} f_{e}\\[2ex]
+\vec{\dot{x}}(t)&=& \vec{A}\vec{x}(t)+\vec{B} \vec{u}(t)\\[2ex]
+\vec{y}(t) &=& \vec{C}\vec{x}(t)
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Príklad}
+Nosník je votknutý na jednom konci a na druhom je vo¾ný. Opí¹me tento systém ako hmotný bod na pru¾ine a tlmièi ktorého parametre sú:\\[3ex]
+ m = 0.1782 [kg]\\
+ k = 470 [N/m]\\
+ b = 0.08344 [Ns/m]\\[2ex]
+
+\begin{itemize}
+\item Aká je odozva systému (v otvorenej sluèke) na poèiatoènú výchylku 10mm, t.j. $q(0) = 0.01 m$?
+\item Aká je odozva systému na skokovú zmenu zá»a¾e o sile 1N?
+\item Aká je vlastná frekvencia systému?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Pomôcky}
+\begin{itemize}
+\item Definujte známe parametre (m=... k=...)
+\item Definujte model v stavovom priestore (A=... B=...)
+\item Vytvorte objekt stavového modelu pomocou príkazu "\textbf{ss}"
+\item Definujte poèiatoènú podmienku (x0=...)
+\item Použite funkciu "\textbf{initial}" na vykreslenie odozvy na poèiatoèné podmienky
+\item Použite funkciu "\textbf{step}" na vykreslenie odozvy na skokovú zmenu sily
+\item Použite funkciu "\textbf{bode}" na vykreslenie frekvenènej odozvy systému a nájdite na nej vlastnú frekvenciu systému
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pomôcky}
+\begin{columns}[T]
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 6cm]{initial.eps}\\
+\includegraphics[width = 6cm]{step.eps}
+\end{figure}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width = 6cm]{bode.eps}
+\end{figure}
+\end{column}
+
+\end{columns}
+\end{frame}
+
+\end{document}
